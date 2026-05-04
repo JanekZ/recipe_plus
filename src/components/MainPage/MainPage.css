@@ -1,0 +1,24 @@
+.promotional-banner {
+    background-color: #F17939;
+    width: 100%;
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding-top: 2vw;
+    padding-bottom: 2vw;
+}
+
+.promo-text {
+    width: 80%;
+}
+
+.promotional-banner h1 {
+    font-weight: bold;
+    font-size: 3vw;
+    margin: 0;
+}
+
+.promotional-banner h2 {
+    font-size: 2vw;
+    margin: 0;
+}
