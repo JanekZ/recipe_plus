@@ -38,8 +38,19 @@
     font-size: 1vw;
 }
 
+.tab-button.active {
+    background-color: #F17939;
+    color: #FFFFFF;
+    border: none;
+}
+
 .tab-button:hover {
     background-color: #000000;
+    color: #FFFFFF;
+}
+
+.tab-button-bold.active {
+    background-color: #F17939;
     color: #FFFFFF;
 }
 

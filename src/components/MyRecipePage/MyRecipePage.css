@@ -1,0 +1,29 @@
+.visibility-toggle {
+    display: flex;
+    justify-content: flex-start;
+    padding: 1rem 10% 0;
+}
+
+.toggle-group {
+    display: flex;
+    background-color: #F6F4F4;
+    border-radius: 0.5rem;
+    padding: 4px;
+}
+
+.toggle-btn {
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.4rem 1.2rem;
+    border: none;
+    border-radius: 0.4rem;
+    background-color: transparent;
+    color: #555555;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.toggle-btn.active {
+    background-color: #F17939;
+    color: #FFFFFF;
+}

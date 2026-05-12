@@ -1,0 +1,140 @@
+.add-bar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 10%;
+    background-color: #F6F4F4;
+}
+
+.add-product-btn {
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #F17939;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+.add-product-btn:hover {
+    background-color: #d95f1a;
+}
+
+.products-content {
+    padding: 1rem 10%;
+    background-color: #F6F4F4;
+    min-height: 100vh;
+}
+
+.product-section {
+    margin-bottom: 2rem;
+}
+
+.category-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 1rem 0;
+}
+
+.product-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.product-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background-color: #FFFFFF;
+    border: 1px solid #dddddd;
+    border-radius: 2rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    color: #333333;
+}
+
+.chip-delete {
+    background: none;
+    border: none;
+    font-size: 0.75rem;
+    color: #999999;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.chip-delete:hover {
+    color: #c62828;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-content {
+    background-color: #FFFFFF;
+    border-radius: 1rem;
+    padding: 2rem;
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #000000;
+    margin: 0;
+}
+
+.modal-input {
+    font-size: 1rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #cccccc;
+    border-radius: 0.5rem;
+    outline: none;
+}
+
+.modal-input:focus {
+    border-color: #F17939;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.modal-btn {
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.modal-btn.cancel {
+    background-color: #F6F4F4;
+    color: #555555;
+}
+
+.modal-btn.confirm {
+    background-color: #F17939;
+    color: #FFFFFF;
+}
+
+.modal-btn.confirm:hover {
+    background-color: #d95f1a;
+}
