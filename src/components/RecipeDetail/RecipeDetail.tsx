@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Navbar from '../Navbar/Navbar.tsx'
 import './RecipeDetail.css'
 
@@ -20,14 +20,13 @@ interface Step {
 
 const skladnikiCategories = ['warzywa', 'owoce', 'mięso', 'nabiał', 'pieczywo', 'inne']
 
-let nextIngredientId = 1
-let nextStepId = 1
-
-function IngredientsTab(){
-    const [ingredients, setIngredients] = useState<Ingredient[]>([])
-
+function IngredientsTab({ ingredients, setIngredients }: {
+    ingredients: Ingredient[]
+    setIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>>
+}){
     const addIngredient = () => {
-        setIngredients(prev => [...prev, { id: nextIngredientId++, category: skladnikiCategories[0], product: '', quantity: '' }])
+        const nextId = Math.max(...ingredients.map(i => i.id), 0) + 1
+        setIngredients(prev => [...prev, { id: nextId, category: skladnikiCategories[0], product: '', quantity: '' }])
     }
 
     const removeIngredient = (id: number) => {
@@ -90,11 +89,13 @@ function IngredientsTab(){
     )
 }
 
-function StepsTab(){
-    const [steps, setSteps] = useState<Step[]>([])
-
+function StepsTab({ steps, setSteps }: {
+    steps: Step[]
+    setSteps: React.Dispatch<React.SetStateAction<Step[]>>
+}){
     const addStep = () => {
-        setSteps(prev => [...prev, { id: nextStepId++, action: '', description: '', temperature: '', speed: '', time: '' }])
+        const nextId = Math.max(...steps.map(s => s.id), 0) + 1
+        setSteps(prev => [...prev, { id: nextId, action: '', description: '', temperature: '', speed: '', time: '' }])
     }
 
     const removeStep = (id: number) => {
@@ -171,9 +172,31 @@ function StepsTab(){
 
 export default function RecipeDetail(){
     const [activeTab, setActiveTab] = useState<'basic' | 'ingredients' | 'steps'>('basic')
-    const [autoGenerate, setAutoGenerate] = useState(false)
-    const [isPublic, setIsPublic] = useState(true)
     const fileInputRef = useRef<HTMLInputElement>(null)
+
+    const [recipeName, setRecipeName] = useState('')
+    const [recipeDescription, setRecipeDescription] = useState('')
+    const [autoGenerate, setAutoGenerate] = useState(false)
+    const [recipeCategory, setRecipeCategory] = useState('')
+    const [recipePortions, setRecipePortions] = useState('')
+    const [isPublic, setIsPublic] = useState(true)
+
+    const [ingredients, setIngredients] = useState<Ingredient[]>([])
+    const [steps, setSteps] = useState<Step[]>([])
+
+    useEffect(() => {
+        const keys = ['recipeName', 'recipeDescription', 'autoGenerate', 'recipeCategory', 'recipePortions', 'isPublic', 'ingredients', 'steps']
+        keys.forEach(k => sessionStorage.removeItem(k))
+    }, [])
+
+    useEffect(() => { sessionStorage.setItem('recipeName', recipeName) }, [recipeName])
+    useEffect(() => { sessionStorage.setItem('recipeDescription', recipeDescription) }, [recipeDescription])
+    useEffect(() => { sessionStorage.setItem('autoGenerate', String(autoGenerate)) }, [autoGenerate])
+    useEffect(() => { sessionStorage.setItem('recipeCategory', recipeCategory) }, [recipeCategory])
+    useEffect(() => { sessionStorage.setItem('recipePortions', recipePortions) }, [recipePortions])
+    useEffect(() => { sessionStorage.setItem('isPublic', String(isPublic)) }, [isPublic])
+    useEffect(() => { sessionStorage.setItem('ingredients', JSON.stringify(ingredients)) }, [ingredients])
+    useEffect(() => { sessionStorage.setItem('steps', JSON.stringify(steps)) }, [steps])
 
     return (
         <>
@@ -207,12 +230,16 @@ export default function RecipeDetail(){
                         <input
                             className="detail-input"
                             placeholder="np. pomidorowa"
+                            value={recipeName}
+                            onChange={e => setRecipeName(e.target.value)}
                         />
 
                         <label className="detail-label">Opis</label>
                         <input
                             className="detail-input"
                             placeholder="Dodaj opis"
+                            value={recipeDescription}
+                            onChange={e => setRecipeDescription(e.target.value)}
                         />
 
                         <div className="auto-description-box">
@@ -238,6 +265,8 @@ export default function RecipeDetail(){
                                 <input
                                     className="detail-input"
                                     placeholder="np. obiad"
+                                    value={recipeCategory}
+                                    onChange={e => setRecipeCategory(e.target.value)}
                                 />
                             </div>
                             <div className="detail-field">
@@ -245,6 +274,8 @@ export default function RecipeDetail(){
                                 <input
                                     className="detail-input"
                                     placeholder="np. 4"
+                                    value={recipePortions}
+                                    onChange={e => setRecipePortions(e.target.value)}
                                 />
                             </div>
                         </div>
@@ -279,11 +310,11 @@ export default function RecipeDetail(){
                 )}
 
                 {activeTab === 'ingredients' && (
-                    <IngredientsTab />
+                    <IngredientsTab ingredients={ingredients} setIngredients={setIngredients} />
                 )}
 
                 {activeTab === 'steps' && (
-                    <StepsTab />
+                    <StepsTab steps={steps} setSteps={setSteps} />
                 )}
             </div>
         </>
