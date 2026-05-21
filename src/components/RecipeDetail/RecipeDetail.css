@@ -216,7 +216,6 @@
     font-weight: 700;
     color: #333;
     margin: 0;
-    text-transform: lowercase;
 }
 
 .add-ingredient-btn {
@@ -281,6 +280,13 @@
 
 .ingredient-field .detail-label {
     margin-top: 0;
+}
+
+.step-index {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 0.75rem 0;
 }
 
 .ingredient-summary {

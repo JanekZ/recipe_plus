@@ -9,9 +9,19 @@ interface Ingredient {
     quantity: string
 }
 
+interface Step {
+    id: number
+    action: string
+    description: string
+    temperature: string
+    speed: string
+    time: string
+}
+
 const skladnikiCategories = ['warzywa', 'owoce', 'mięso', 'nabiał', 'pieczywo', 'inne']
 
 let nextIngredientId = 1
+let nextStepId = 1
 
 function IngredientsTab(){
     const [ingredients, setIngredients] = useState<Ingredient[]>([])
@@ -31,7 +41,7 @@ function IngredientsTab(){
     return (
         <div>
             <div className="ingredients-header">
-                <h3 className="ingredients-title">składniki:</h3>
+                <h3 className="ingredients-title">Składniki:</h3>
                 <button className="add-ingredient-btn" onClick={addIngredient}>
                     Dodaj składnik
                 </button>
@@ -72,6 +82,85 @@ function IngredientsTab(){
                         </div>
                         <div className="ingredient-summary">
                             {ing.quantity} {ing.product}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+}
+
+function StepsTab(){
+    const [steps, setSteps] = useState<Step[]>([])
+
+    const addStep = () => {
+        setSteps(prev => [...prev, { id: nextStepId++, action: '', description: '', temperature: '', speed: '', time: '' }])
+    }
+
+    const removeStep = (id: number) => {
+        setSteps(prev => prev.filter(s => s.id !== id))
+    }
+
+    const updateStep = (id: number, field: keyof Step, value: string) => {
+        setSteps(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s))
+    }
+
+    return (
+        <div>
+            <div className="ingredients-header">
+                <h3 className="ingredients-title">Kroki:</h3>
+                <button className="add-ingredient-btn" onClick={addStep}>
+                    Dodaj Krok
+                </button>
+            </div>
+            <div className="ingredients-list">
+                {steps.map((step, index) => (
+                    <div key={step.id} className="ingredient-box">
+                        <button className="ingredient-remove" onClick={() => removeStep(step.id)}>✖</button>
+                        <h4 className="step-index">Krok - {index + 1}</h4>
+                        <div className="ingredient-fields">
+                            <div className="ingredient-field">
+                                <label className="detail-label">Akcja</label>
+                                <input
+                                    className="detail-input"
+                                    value={step.action}
+                                    onChange={e => updateStep(step.id, 'action', e.target.value)}
+                                />
+                            </div>
+                            <div className="ingredient-field">
+                                <label className="detail-label">Opis</label>
+                                <input
+                                    className="detail-input"
+                                    value={step.description}
+                                    onChange={e => updateStep(step.id, 'description', e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="ingredient-fields">
+                            <div className="ingredient-field">
+                                <label className="detail-label">Temperatura (C)</label>
+                                <input
+                                    className="detail-input"
+                                    value={step.temperature}
+                                    onChange={e => updateStep(step.id, 'temperature', e.target.value)}
+                                />
+                            </div>
+                            <div className="ingredient-field">
+                                <label className="detail-label">Prędkość noży (0-5)</label>
+                                <input
+                                    className="detail-input"
+                                    value={step.speed}
+                                    onChange={e => updateStep(step.id, 'speed', e.target.value)}
+                                />
+                            </div>
+                            <div className="ingredient-field">
+                                <label className="detail-label">Czas (sekundy)</label>
+                                <input
+                                    className="detail-input"
+                                    value={step.time}
+                                    onChange={e => updateStep(step.id, 'time', e.target.value)}
+                                />
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -194,9 +283,7 @@ export default function RecipeDetail(){
                 )}
 
                 {activeTab === 'steps' && (
-                    <div className="detail-placeholder">
-                        <p>Kroki — wkrótce</p>
-                    </div>
+                    <StepsTab />
                 )}
             </div>
         </>
