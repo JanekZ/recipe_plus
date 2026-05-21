@@ -1,7 +1,11 @@
 import {useState} from 'react';
 import './SearchBar.css'
 
-export default function SearchBar(){
+interface SearchBarProps {
+    onOpenFilter?: () => void
+}
+
+export default function SearchBar({ onOpenFilter }: SearchBarProps){
     const [searchText, setSearchText] = useState('');
 
 return(
@@ -24,7 +28,7 @@ return(
                         ✖️
                     </button>
                 </div>
-                <button className="filters-button">
+                <button className="filters-button" onClick={onOpenFilter}>
                     Filtry
                 </button>
             </div>
