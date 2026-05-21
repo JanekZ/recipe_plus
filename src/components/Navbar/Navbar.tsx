@@ -31,7 +31,7 @@ export default function Navbar(){
                     + Nowy Przepis
                 </button>
             </div>
-            <img src="src/assets/user.png" style={{height: '50%'}}/>
+            <img src="src/assets/user.png" style={{height: '50%', cursor: 'pointer'}} onClick={() => navigate('/konto')}/>
         </div>
     )
 }

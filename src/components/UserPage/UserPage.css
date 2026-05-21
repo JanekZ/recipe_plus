@@ -1,0 +1,81 @@
+.user-page {
+    margin: 2rem 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.user-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 1.5rem 0;
+    width: 100%;
+    max-width: 500px;
+}
+
+.user-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 1rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 500px;
+}
+
+.user-card .detail-input {
+    margin-bottom: 0.25rem;
+}
+
+.save-btn {
+    margin-top: 1rem;
+    margin-left: auto;
+    padding: 0.5rem 1.2rem;
+    background-color: #222;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: fit-content;
+}
+
+.save-btn:hover {
+    background-color: #444;
+}
+
+.deactivation-row {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 500px;
+}
+
+.deactivate-btn {
+    padding: 0.7rem 1.2rem;
+    background-color: #c62828;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.deactivate-btn:hover {
+    background-color: #b71c1c;
+}
+
+.deactivate-text {
+    font-size: 0.8rem;
+    color: #888;
+    line-height: 1.4;
+}
