@@ -98,6 +98,13 @@
     margin: 0;
 }
 
+.modal-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: -0.5rem;
+}
+
 .modal-input {
     font-size: 1rem;
     padding: 0.6rem 0.8rem;

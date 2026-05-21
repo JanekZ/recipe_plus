@@ -27,7 +27,7 @@ export default function Navbar(){
                 >
                     Moje Produkty
                 </button>
-                <button className="tab-button-bold">
+                <button className="tab-button-bold" onClick={() => navigate('/nowy-przepis')}>
                     + Nowy Przepis
                 </button>
             </div>

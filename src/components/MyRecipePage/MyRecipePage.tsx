@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Navbar from "../Navbar/Navbar.tsx"
 import SearchBar from "../SearchBar/SearchBar.tsx"
 import FoodGallery from "../FoodGallery/FoodGallery.tsx"
@@ -8,6 +9,7 @@ import './MyRecipePage.css'
 type VisibilityFilter = 'all' | 'public' | 'private'
 
 export default function MyRecipePage(){
+    const navigate = useNavigate()
     const [filter, setFilter] = useState<VisibilityFilter>('all')
 
     const publicCount = recipes.filter(r => r.isPublic).length
@@ -47,7 +49,7 @@ export default function MyRecipePage(){
             {showEmpty ? (
                 <div className="empty-recipes">
                     <p>{emptyMessage}</p>
-                    <button>Dodaj przepis</button>
+                    <button onClick={() => navigate('/nowy-przepis')}>Dodaj przepis</button>
                 </div>
             ) : (
                 <FoodGallery filter={filter} showVisibility={filter === 'all'} hideSearchBar />
