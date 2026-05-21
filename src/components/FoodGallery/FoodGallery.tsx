@@ -8,9 +8,10 @@ import './FoodGallery.css'
 interface FoodGalleryProps {
     filter?: 'all' | 'public' | 'private'
     showVisibility?: boolean
+    hideSearchBar?: boolean
 }
 
-export default function FoodGallery({ filter = 'all', showVisibility = false }: FoodGalleryProps){
+export default function FoodGallery({ filter = 'all', showVisibility = false, hideSearchBar = false }: FoodGalleryProps){
     const [showFilter, setShowFilter] = useState(false)
     const [filterCategory, setFilterCategory] = useState('')
     const [filterAuthor, setFilterAuthor] = useState('')
@@ -35,7 +36,7 @@ export default function FoodGallery({ filter = 'all', showVisibility = false }: 
 
     return (
         <>
-            <SearchBar onOpenFilter={() => setShowFilter(true)} />
+            {!hideSearchBar && <SearchBar onOpenFilter={() => setShowFilter(true)} />}
             <div className="gallery-grid">
                 {filtered.map((recipe, index) => (
                     <RecipeCard

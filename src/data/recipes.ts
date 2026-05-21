@@ -38,7 +38,7 @@ export const recipes: Recipe[] = [
         cookingTime: 25,
         portions: 3,
         author: 'placeholder',
-        isPublic: false
+        isPublic: true
     },
     {
         image: 'https://placehold.co/400x300/FF9F6C/white?text=Sałatka',
@@ -58,7 +58,7 @@ export const recipes: Recipe[] = [
         cookingTime: 35,
         portions: 4,
         author: 'placeholder',
-        isPublic: false
+        isPublic: true
     },
     {
         image: 'https://placehold.co/400x300/FF9F6C/white?text=Tiramisu',

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Navbar from "../Navbar/Navbar.tsx"
+import SearchBar from "../SearchBar/SearchBar.tsx"
 import FoodGallery from "../FoodGallery/FoodGallery.tsx"
 import { recipes } from "../../data/recipes.ts"
 import './MyRecipePage.css'
@@ -11,6 +12,11 @@ export default function MyRecipePage(){
 
     const publicCount = recipes.filter(r => r.isPublic).length
     const privateCount = recipes.filter(r => !r.isPublic).length
+
+    const showEmpty = (filter === 'public' && publicCount === 0) || (filter === 'private' && privateCount === 0)
+    const emptyMessage = filter === 'private'
+        ? 'Nie masz jeszcze żadnego prywatnego przepisu'
+        : 'Nie masz jeszcze żadnego publicznego przepisu'
 
     return (
         <>
@@ -37,7 +43,15 @@ export default function MyRecipePage(){
                     </button>
                 </div>
             </div>
-            <FoodGallery filter={filter} showVisibility={filter === 'all'} />
+            <SearchBar />
+            {showEmpty ? (
+                <div className="empty-recipes">
+                    <p>{emptyMessage}</p>
+                    <button>Dodaj przepis</button>
+                </div>
+            ) : (
+                <FoodGallery filter={filter} showVisibility={filter === 'all'} hideSearchBar />
+            )}
         </>
     )
 }
