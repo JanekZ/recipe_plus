@@ -1,8 +1,10 @@
+import { useNavigate } from 'react-router-dom'
 import './RecipeCard.css'
 
 const MAX_DESC_WORDS = 50
 
 interface RecipeCardProps {
+    id: number
     image: string
     name: string
     description: string
@@ -20,9 +22,10 @@ function truncateWords(text: string, maxWords: number){
     return words.slice(0, maxWords).join(' ') + '...'
 }
 
-export default function RecipeCard({ image, name, description, tag, cookingTime, portions, author, isPublic, showVisibility = false }: RecipeCardProps){
+export default function RecipeCard({ id, image, name, description, tag, cookingTime, portions, author, isPublic, showVisibility = false }: RecipeCardProps){
+    const navigate = useNavigate()
     return (
-        <div className="recipe-card">
+        <div className="recipe-card" onClick={() => navigate(`/przepis/${id}`)}>
             <img className="recipe-image" src={image} alt={name} />
             <div className="recipe-content">
                 <div className="recipe-tags">

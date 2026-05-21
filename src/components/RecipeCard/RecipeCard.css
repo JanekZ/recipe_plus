@@ -6,6 +6,7 @@
     transition: transform 0.2s ease;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
 }
 
 .recipe-card:hover {

@@ -1,4 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom'
+import logo from '../../assets/logo.png'
+import user from '../../assets/user.png'
 import './Navbar.css'
 
 export default function Navbar(){
@@ -7,7 +9,7 @@ export default function Navbar(){
 
     return (
         <div className="navbar">
-            <img src="src/assets/logo.png" style={{height: '95%'}}/>
+            <img src={logo} style={{height: '95%'}}/>
             <div className="buttons">
                 <button
                     className={`tab-button${location.pathname === '/' ? ' active' : ''}`}
@@ -31,7 +33,7 @@ export default function Navbar(){
                     + Nowy Przepis
                 </button>
             </div>
-            <img src="src/assets/user.png" style={{height: '50%', cursor: 'pointer'}} onClick={() => navigate('/konto')}/>
+            <img src={user} style={{height: '50%', cursor: 'pointer'}} onClick={() => navigate('/konto')}/>
         </div>
     )
 }

@@ -41,6 +41,7 @@ export default function FoodGallery({ filter = 'all', showVisibility = false, hi
                 {filtered.map((recipe, index) => (
                     <RecipeCard
                         key={index}
+                        id={recipe.id}
                         image={recipe.image}
                         name={recipe.name}
                         description={recipe.description}
