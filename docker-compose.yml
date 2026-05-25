@@ -24,3 +24,17 @@ services:
       - VITE_AI_URL=
     networks:
       - recipe-network
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=recipe_user
+      - POSTGRES_PASSWORD=recipe_pass
+      - POSTGRES_DB=recipe_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - recipe-network
