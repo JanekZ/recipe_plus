@@ -25,6 +25,25 @@ services:
     networks:
       - recipe-network
 
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    ports:
+      - '3002:3002'
+    volumes:
+      - ./auth-service:/app
+      - /app/node_modules
+    environment:
+      - PORT=3002
+      - POSTGRES_URL=postgresql://recipe_user:recipe_pass@postgres:5432/recipe_db
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=7d
+    depends_on:
+      - postgres
+    networks:
+      - recipe-network
+
   ai-service:
     build:
       context: ./ai-service
