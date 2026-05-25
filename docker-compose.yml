@@ -38,3 +38,14 @@ services:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - recipe-network
+
+  mongo:
+    image: mongo:7-jammy
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_DATABASE=recipe_ingredients
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - recipe-network
