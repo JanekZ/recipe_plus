@@ -19,9 +19,9 @@ services:
       - .:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=
-      - VITE_AUTH_URL=
-      - VITE_AI_URL=
+      - VITE_API_URL=http://localhost:3001
+      - VITE_AUTH_URL=http://localhost:3002
+      - VITE_AI_URL=http://localhost:8000
     networks:
       - recipe-network
 
@@ -41,6 +41,27 @@ services:
       - JWT_EXPIRES_IN=7d
     depends_on:
       - postgres
+    networks:
+      - recipe-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - PORT=3001
+      - POSTGRES_URL=postgresql://recipe_user:recipe_pass@postgres:5432/recipe_db
+      - MONGO_URL=mongodb://mongo:27017/recipe_ingredients
+      - JWT_SECRET=${JWT_SECRET}
+      - AUTH_SERVICE_URL=http://auth-service:3002
+    depends_on:
+      - postgres
+      - mongo
     networks:
       - recipe-network
 
