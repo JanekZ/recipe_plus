@@ -25,6 +25,22 @@ services:
     networks:
       - recipe-network
 
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./ai-service:/app
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MONGO_URL=mongodb://mongo:27017/recipe_ingredients
+    depends_on:
+      - mongo
+    networks:
+      - recipe-network
+
   postgres:
     image: postgres:16-alpine
     ports:
