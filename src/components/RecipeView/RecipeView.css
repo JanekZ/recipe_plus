@@ -135,3 +135,131 @@
     font-size: 0.85rem;
     color: #666;
 }
+
+.view-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.start-btn {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 14px;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #F17939;
+    color: #FFFFFF;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.start-btn:hover {
+    background-color: #d4652e;
+}
+
+.showcase-panel {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 280px;
+    background-color: #FFFFFF;
+    border: 2px solid #F17939;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.showcase-panel-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(241, 121, 57, 0.25);
+    transition: width 1s linear;
+    z-index: 0;
+}
+
+.showcase-panel-content {
+    position: relative;
+    z-index: 1;
+}
+
+.showcase-panel-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+    line-height: 1;
+}
+
+.showcase-panel-close:hover {
+    color: #333;
+}
+
+.showcase-panel-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: #F17939;
+}
+
+.showcase-panel-action {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 0.5rem 0;
+}
+
+.showcase-panel-timer {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #F17939;
+    margin: 0 0 0.75rem 0;
+    text-align: center;
+}
+
+.showcase-panel-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.showcase-ctrl-btn {
+    border: 1px solid #F17939;
+    border-radius: 0.5rem;
+    background: none;
+    color: #F17939;
+    font-size: 1rem;
+    padding: 4px 12px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.showcase-ctrl-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.showcase-ctrl-btn:not(:disabled):hover {
+    background-color: #F17939;
+    color: #FFFFFF;
+}
+
+.showcase-ctrl-main {
+    background-color: #F17939;
+    color: #FFFFFF;
+    font-size: 1rem;
+    padding: 4px 16px;
+}
+
+.showcase-ctrl-main:hover {
+    background-color: #d4652e;
+}

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Navbar from '../Navbar/Navbar.tsx'
 import { recipes } from '../../data/recipes.ts'
@@ -8,6 +9,56 @@ export default function RecipeView(){
     const { id } = useParams()
     const recipe = recipes.find(r => r.id === Number(id))
     const products = getProducts()
+    const [showShowcase, setShowShowcase] = useState(false)
+    const [timer, setTimer] = useState(0)
+    const [maxTime, setMaxTime] = useState(0)
+    const [currentStep, setCurrentStep] = useState(0)
+    const [isRunning, setIsRunning] = useState(false)
+
+    useEffect(() => {
+        if (showShowcase && recipe) {
+            setCurrentStep(0)
+            const t = parseInt(recipe.steps[0].time) || 0
+            setTimer(t)
+            setMaxTime(t)
+            setIsRunning(true)
+        } else {
+            setTimer(0)
+            setMaxTime(0)
+            setCurrentStep(0)
+            setIsRunning(false)
+        }
+    }, [showShowcase])
+
+    useEffect(() => {
+        if (!showShowcase || !recipe) return
+        const step = recipe.steps[currentStep]
+        if (!step) return
+        const t = parseInt(step.time) || 0
+        setTimer(t)
+        setMaxTime(t)
+        setIsRunning(true)
+    }, [currentStep])
+
+    useEffect(() => {
+        if (timer <= 0 || !showShowcase || !isRunning) return
+        const id = setInterval(() => setTimer(t => t - 1), 1000)
+        return () => clearInterval(id)
+    }, [timer, showShowcase, isRunning])
+
+    useEffect(() => {
+        if (timer === 0 && showShowcase && recipe && maxTime > 0 && currentStep < recipe.steps.length - 1) {
+            const stepTime = parseInt(recipe.steps[currentStep].time) || 0
+            if (stepTime !== maxTime) return
+            setCurrentStep(s => s + 1)
+        }
+    }, [timer])
+
+    const formatTime = (s: number): string => {
+        const m = Math.floor(s / 60)
+        const sec = s % 60
+        return `${m}:${sec.toString().padStart(2, '0')}`
+    }
 
     const getUnit = (name: string): string => {
         const product = products.find(p => p.name === name)
@@ -30,7 +81,10 @@ export default function RecipeView(){
             <Navbar />
             <div className="view-container">
                 <span className="view-tag">{recipe.tag}</span>
-                <h1 className="view-name">{recipe.name}</h1>
+                <div className="view-name-row">
+                    <h1 className="view-name">{recipe.name}</h1>
+                    <button className="start-btn" onClick={() => setShowShowcase(s => !s)}>start</button>
+                </div>
                 <p className="view-description">{recipe.description}</p>
                 <p className="view-author">Autor: {recipe.author}</p>
 
@@ -71,6 +125,22 @@ export default function RecipeView(){
                     ))}
                 </div>
             </div>
+            {showShowcase && (
+                <div className="showcase-panel">
+                    <div className="showcase-panel-fill" style={{ width: `${maxTime > 0 ? (1 - timer / maxTime) * 100 : 0}%` }} />
+                    <div className="showcase-panel-content">
+                        <button className="showcase-panel-close" onClick={() => setShowShowcase(false)}>×</button>
+                        <h4 className="showcase-panel-name">{recipe.name}</h4>
+                        <p className="showcase-panel-action">Krok {currentStep + 1} | {recipe.steps[currentStep].action}</p>
+                        <p className="showcase-panel-timer">{formatTime(timer)}</p>
+                        <div className="showcase-panel-controls">
+                            <button className="showcase-ctrl-btn" onClick={() => setCurrentStep(s => Math.max(0, s - 1))} disabled={currentStep === 0}>&#9664;</button>
+                            <button className="showcase-ctrl-btn showcase-ctrl-main" onClick={() => setIsRunning(s => !s)}>{isRunning ? '⏸' : '▶'}</button>
+                            <button className="showcase-ctrl-btn" onClick={() => setCurrentStep(s => Math.min(recipe.steps.length - 1, s + 1))} disabled={currentStep === recipe.steps.length - 1}>&#9654;</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     )
 }
