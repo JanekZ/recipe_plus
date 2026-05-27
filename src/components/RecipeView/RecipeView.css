@@ -156,7 +156,7 @@
 }
 
 .start-btn:hover {
-    background-color: #d4652e;
+    background-color: #d95f1a;
 }
 
 .showcase-panel {
@@ -194,7 +194,7 @@
     right: 0.5rem;
     background: none;
     border: none;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     cursor: pointer;
     color: #888;
     line-height: 1;
@@ -261,5 +261,5 @@
 }
 
 .showcase-ctrl-main:hover {
-    background-color: #d4652e;
+    background-color: #d95f1a;
 }

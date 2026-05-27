@@ -29,7 +29,7 @@
     border: none;
     border-radius: 0.4rem;
     background-color: transparent;
-    color: #555555;
+    color: #555;
     cursor: pointer;
     transition: background-color 0.15s, color 0.15s;
 }
@@ -201,7 +201,7 @@
 }
 
 .image-button:hover {
-    background-color: #e0662a;
+    background-color: #d95f1a;
 }
 
 .ingredients-header {

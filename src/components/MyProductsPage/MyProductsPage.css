@@ -48,18 +48,18 @@
     align-items: center;
     gap: 0.4rem;
     background-color: #FFFFFF;
-    border: 1px solid #dddddd;
+    border: 1px solid #ddd;
     border-radius: 2rem;
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
-    color: #333333;
+    color: #333;
 }
 
 .chip-delete {
     background: none;
     border: none;
     font-size: 0.75rem;
-    color: #999999;
+    color: #999;
     cursor: pointer;
     padding: 0;
     line-height: 1;
@@ -134,7 +134,7 @@
 
 .modal-btn.cancel {
     background-color: #F6F4F4;
-    color: #555555;
+    color: #555;
 }
 
 .modal-btn.confirm {

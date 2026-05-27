@@ -74,7 +74,7 @@
 .filter-inputs input {
     padding: 0.5rem;
     border: 1px solid #ddd;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     font-size: 0.9rem;
     background: #F6F4F4;
     outline: none;
@@ -97,5 +97,5 @@
 }
 
 .filter-clear:hover {
-    background-color: #e0662a;
+    background-color: #d95f1a;
 }
