@@ -119,6 +119,13 @@
     margin: 0 0 0.75rem 0;
 }
 
+.view-step-ingredient {
+    font-size: 0.9rem;
+    color: #F17939;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+}
+
 .view-step-meta {
     display: flex;
     justify-content: space-around;

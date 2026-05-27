@@ -4,6 +4,8 @@ export interface RecipeStep {
     temperature: string
     speed: string
     time: string
+    ingredient?: string
+    ingredientAmount?: string
 }
 
 export interface Recipe {

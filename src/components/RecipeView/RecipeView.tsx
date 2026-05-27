@@ -50,6 +50,11 @@ export default function RecipeView(){
                                 <span className="view-step-action">{step.action}</span>
                             </div>
                             <p className="view-step-desc">{step.description}</p>
+                            {step.ingredient && (
+                                <p className="view-step-ingredient">
+                                    Składnik: {step.ingredient} {step.ingredientAmount && `(${step.ingredientAmount})`}
+                                </p>
+                            )}
                             <div className="view-step-meta">
                                 <span>🌡️ Temperatura: {step.temperature}°C</span>
                                 <span>⚡ Prędkość: {step.speed}</span>

@@ -1,49 +1,27 @@
 import { useState } from 'react'
 import Navbar from "../Navbar/Navbar.tsx"
 import SearchBar from "../SearchBar/SearchBar.tsx"
+import { getProducts, addProduct as addSharedProduct, deleteProduct as deleteSharedProduct } from '../../data/products.ts'
 import './MyProductsPage.css'
-
-interface Product {
-    id: number
-    name: string
-    category: string
-    unit: string
-}
 
 const categories = ['warzywa', 'owoce', 'mięso', 'nabiał', 'pieczywo', 'inne']
 
-const initialProducts: Product[] = [
-    { id: 1, name: 'Marchewka', category: 'warzywa', unit: 'kg' },
-    { id: 2, name: 'Pomidor', category: 'warzywa', unit: 'kg' },
-    { id: 3, name: 'Ogórek', category: 'warzywa', unit: 'szt' },
-    { id: 4, name: 'Cebula', category: 'warzywa', unit: 'kg' },
-    { id: 5, name: 'Papryka', category: 'warzywa', unit: 'kg' },
-    { id: 6, name: 'Jabłko', category: 'owoce', unit: 'kg' },
-    { id: 7, name: 'Banan', category: 'owoce', unit: 'kg' },
-    { id: 8, name: 'Pomarańcza', category: 'owoce', unit: 'kg' },
-    { id: 9, name: 'Truskawka', category: 'owoce', unit: 'kg' },
-    { id: 10, name: 'Winogrona', category: 'owoce', unit: 'kg' },
-    { id: 11, name: 'Kurczak', category: 'mięso', unit: 'kg' },
-    { id: 12, name: 'Wołowina', category: 'mięso', unit: 'kg' },
-    { id: 13, name: 'Wieprzowina', category: 'mięso', unit: 'kg' },
-    { id: 14, name: 'Łosoś', category: 'mięso', unit: 'kg' },
-]
-
 export default function MyProductsPage(){
-    const [products, setProducts] = useState(initialProducts)
+    const [products, setProducts] = useState(getProducts)
     const [showModal, setShowModal] = useState(false)
     const [newName, setNewName] = useState('')
     const [newCategory, setNewCategory] = useState('inne')
     const [newUnit, setNewUnit] = useState('')
 
     const deleteProduct = (id: number) => {
-        setProducts(prev => prev.filter(p => p.id !== id))
+        deleteSharedProduct(id)
+        setProducts(getProducts())
     }
 
     const addProduct = () => {
         if (!newName.trim() || !newUnit.trim()) return
-        const nextId = Math.max(...products.map(p => p.id), 0) + 1
-        setProducts(prev => [...prev, { id: nextId, name: newName.trim(), category: newCategory, unit: newUnit.trim() }])
+        addSharedProduct(newName.trim(), newCategory, newUnit.trim())
+        setProducts(getProducts())
         setNewName('')
         setNewCategory(categories[0])
         setNewUnit('')
