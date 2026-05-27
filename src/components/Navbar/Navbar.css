@@ -33,9 +33,10 @@
 
 .tab-button, .tab-button-bold {
     color: #000000;
-    padding: 0.5vw 0.5vw;
+    padding: 0.5rem 0.75rem;
     border-radius: 1rem;
-    font-size: 1vw;
+    font-size: clamp(0.8rem, 0.9vw, 1.1rem);
+    white-space: nowrap;
 }
 
 .tab-button.active {
