@@ -4,13 +4,6 @@ import { getProducts } from '../../data/products.ts'
 import type { Product } from '../../data/products.ts'
 import './RecipeDetail.css'
 
-interface Ingredient {
-    id: number
-    category: string
-    product: string
-    quantity: string
-}
-
 interface Step {
     id: number
     action: string
@@ -22,73 +15,47 @@ interface Step {
     ingredientAmount: string
 }
 
-const skladnikiCategories = ['warzywa', 'owoce', 'mięso', 'nabiał', 'pieczywo', 'inne']
+function IngredientsTab({ steps }: { steps: Step[] }){
+    const products = getProducts()
 
-function IngredientsTab({ ingredients, setIngredients }: {
-    ingredients: Ingredient[]
-    setIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>>
-}){
-    const addIngredient = () => {
-        const nextId = Math.max(...ingredients.map(i => i.id), 0) + 1
-        setIngredients(prev => [...prev, { id: nextId, category: skladnikiCategories[0], product: '', quantity: '' }])
-    }
+    const aggregated = steps
+        .filter(s => s.ingredient.trim() && s.ingredientAmount.trim())
+        .reduce<Record<string, number>>((acc, s) => {
+            const amount = parseFloat(s.ingredientAmount)
+            if (isNaN(amount)) return acc
+            acc[s.ingredient] = (acc[s.ingredient] || 0) + amount
+            return acc
+        }, {})
 
-    const removeIngredient = (id: number) => {
-        setIngredients(prev => prev.filter(i => i.id !== id))
-    }
-
-    const updateIngredient = (id: number, field: keyof Ingredient, value: string) => {
-        setIngredients(prev => prev.map(i => i.id === id ? { ...i, [field]: value } : i))
+    const getUnit = (name: string): string => {
+        const product = products.find(p => p.name === name)
+        return product ? product.unit : ''
     }
 
     return (
         <div>
             <div className="ingredients-header">
                 <h3 className="ingredients-title">Składniki:</h3>
-                <button className="add-ingredient-btn" onClick={addIngredient}>
-                    Dodaj składnik
-                </button>
             </div>
-            <div className="ingredients-list">
-                {ingredients.map(ing => (
-                    <div key={ing.id} className="ingredient-box">
-                        <button className="ingredient-remove" onClick={() => removeIngredient(ing.id)}>✖</button>
-                        <div className="ingredient-fields">
-                            <div className="ingredient-field">
-                                <label className="detail-label">Kategoria</label>
-                                <select
-                                    className="detail-input"
-                                    value={ing.category}
-                                    onChange={e => updateIngredient(ing.id, 'category', e.target.value)}
-                                >
-                                    {skladnikiCategories.map(c => (
-                                        <option key={c} value={c}>{c}</option>
-                                    ))}
-                                </select>
+            {Object.keys(aggregated).length === 0 ? (
+                <p className="ingredients-empty">
+                    Brak składników — dodaj składniki w krokach.
+                </p>
+            ) : (
+                <div className="ingredients-list">
+                    {Object.entries(aggregated).map(([name, total]) => {
+                        const unit = getUnit(name)
+                        return (
+                            <div key={name} className="ingredient-summary-box">
+                                <span className="ingredient-summary-name">{name}</span>
+                                <span className="ingredient-summary-amount">
+                                    {total} {unit}
+                                </span>
                             </div>
-                            <div className="ingredient-field">
-                                <label className="detail-label">Produkt</label>
-                                <input
-                                    className="detail-input"
-                                    value={ing.product}
-                                    onChange={e => updateIngredient(ing.id, 'product', e.target.value)}
-                                />
-                            </div>
-                            <div className="ingredient-field">
-                                <label className="detail-label">Ilość</label>
-                                <input
-                                    className="detail-input"
-                                    value={ing.quantity}
-                                    onChange={e => updateIngredient(ing.id, 'quantity', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className="ingredient-summary">
-                            {ing.quantity} {ing.product}
-                        </div>
-                    </div>
-                ))}
-            </div>
+                        )
+                    })}
+                </div>
+            )}
         </div>
     )
 }
@@ -241,6 +208,10 @@ function StepsTab({ steps, setSteps }: {
                                     <div className="quantity-wrapper">
                                         <input
                                             className="detail-input"
+                                            type="number"
+                                            step="any"
+                                            min="0"
+                                            placeholder="0"
                                             value={step.ingredientAmount}
                                             onChange={e => updateStep(step.id, 'ingredientAmount', e.target.value)}
                                         />
@@ -259,7 +230,7 @@ function StepsTab({ steps, setSteps }: {
 }
 
 export default function RecipeDetail(){
-    const [activeTab, setActiveTab] = useState<'basic' | 'ingredients' | 'steps'>('basic')
+    const [activeTab, setActiveTab] = useState<'basic' | 'steps' | 'ingredients'>('basic')
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const [recipeName, setRecipeName] = useState('')
@@ -269,11 +240,10 @@ export default function RecipeDetail(){
     const [recipePortions, setRecipePortions] = useState('')
     const [isPublic, setIsPublic] = useState(true)
 
-    const [ingredients, setIngredients] = useState<Ingredient[]>([])
     const [steps, setSteps] = useState<Step[]>([])
 
     useEffect(() => {
-        const keys = ['recipeName', 'recipeDescription', 'autoGenerate', 'recipeCategory', 'recipePortions', 'isPublic', 'ingredients', 'steps']
+        const keys = ['recipeName', 'recipeDescription', 'autoGenerate', 'recipeCategory', 'recipePortions', 'isPublic', 'steps']
         keys.forEach(k => sessionStorage.removeItem(k))
     }, [])
 
@@ -283,7 +253,6 @@ export default function RecipeDetail(){
     useEffect(() => { sessionStorage.setItem('recipeCategory', recipeCategory) }, [recipeCategory])
     useEffect(() => { sessionStorage.setItem('recipePortions', recipePortions) }, [recipePortions])
     useEffect(() => { sessionStorage.setItem('isPublic', String(isPublic)) }, [isPublic])
-    useEffect(() => { sessionStorage.setItem('ingredients', JSON.stringify(ingredients)) }, [ingredients])
     useEffect(() => { sessionStorage.setItem('steps', JSON.stringify(steps)) }, [steps])
 
     return (
@@ -299,16 +268,16 @@ export default function RecipeDetail(){
                         Podstawowe
                     </button>
                     <button
-                        className={`detail-tab ${activeTab === 'ingredients' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('ingredients')}
-                    >
-                        Składniki
-                    </button>
-                    <button
                         className={`detail-tab ${activeTab === 'steps' ? 'active' : ''}`}
                         onClick={() => setActiveTab('steps')}
                     >
                         Kroki
+                    </button>
+                    <button
+                        className={`detail-tab ${activeTab === 'ingredients' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('ingredients')}
+                    >
+                        Składniki
                     </button>
                 </div>
 
@@ -397,12 +366,12 @@ export default function RecipeDetail(){
                     </div>
                 )}
 
-                {activeTab === 'ingredients' && (
-                    <IngredientsTab ingredients={ingredients} setIngredients={setIngredients} />
-                )}
-
                 {activeTab === 'steps' && (
                     <StepsTab steps={steps} setSteps={setSteps} />
+                )}
+
+                {activeTab === 'ingredients' && (
+                    <IngredientsTab steps={steps} />
                 )}
             </div>
         </>

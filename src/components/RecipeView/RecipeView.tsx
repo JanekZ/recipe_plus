@@ -1,11 +1,18 @@
 import { useParams } from 'react-router-dom'
 import Navbar from '../Navbar/Navbar.tsx'
 import { recipes } from '../../data/recipes.ts'
+import { getProducts } from '../../data/products.ts'
 import './RecipeView.css'
 
 export default function RecipeView(){
     const { id } = useParams()
     const recipe = recipes.find(r => r.id === Number(id))
+    const products = getProducts()
+
+    const getUnit = (name: string): string => {
+        const product = products.find(p => p.name === name)
+        return product ? product.unit : ''
+    }
 
     if (!recipe) {
         return (
@@ -52,7 +59,7 @@ export default function RecipeView(){
                             <p className="view-step-desc">{step.description}</p>
                             {step.ingredient && (
                                 <p className="view-step-ingredient">
-                                    Składnik: {step.ingredient} {step.ingredientAmount && `(${step.ingredientAmount})`}
+                                    Składnik: {step.ingredient}{step.ingredientAmount ? ` ${parseFloat(step.ingredientAmount)} ${getUnit(step.ingredient)}` : ''}
                                 </p>
                             )}
                             <div className="view-step-meta">
