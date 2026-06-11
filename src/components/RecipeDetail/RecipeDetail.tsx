@@ -2,11 +2,18 @@ import { useState, useEffect, useRef } from 'react'
 import Navbar from '../Navbar/Navbar.tsx'
 import { getProducts } from '../../data/products.ts'
 import type { Product } from '../../data/products.ts'
+import type { ActionType } from '../../data/recipes.ts'
 import './RecipeDetail.css'
+
+const ACTION_LABELS: Record<ActionType, string> = {
+    akcyjny: 'Akcja',
+    składnikowy: 'Składnik',
+    opisowy: 'Opis',
+}
 
 interface Step {
     id: number
-    action: string
+    action: ActionType
     description: string
     temperature: string
     speed: string
@@ -71,7 +78,7 @@ function StepsTab({ steps, setSteps }: {
 
     const addStep = () => {
         const nextId = Math.max(...steps.map(s => s.id), 0) + 1
-        setSteps(prev => [...prev, { id: nextId, action: '', description: '', temperature: '', speed: '', time: '', ingredient: '', ingredientAmount: '' }])
+        setSteps(prev => [...prev, { id: nextId, action: 'akcyjny', description: '', temperature: '', speed: '', time: '', ingredient: '', ingredientAmount: '' }])
     }
 
     const removeStep = (id: number) => {
@@ -138,11 +145,15 @@ function StepsTab({ steps, setSteps }: {
                             <div className="ingredient-fields">
                                 <div className="ingredient-field">
                                     <label className="detail-label">Akcja</label>
-                                    <input
+                                    <select
                                         className="detail-input"
                                         value={step.action}
                                         onChange={e => updateStep(step.id, 'action', e.target.value)}
-                                    />
+                                    >
+                                        {Object.entries(ACTION_LABELS).map(([value, label]) => (
+                                            <option key={value} value={value}>{label}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="ingredient-field">
                                     <label className="detail-label">Opis</label>
@@ -153,32 +164,34 @@ function StepsTab({ steps, setSteps }: {
                                     />
                                 </div>
                             </div>
-                            <div className="ingredient-fields">
-                                <div className="ingredient-field">
-                                    <label className="detail-label">Temperatura (C)</label>
-                                    <input
-                                        className="detail-input"
-                                        value={step.temperature}
-                                        onChange={e => updateStep(step.id, 'temperature', e.target.value)}
-                                    />
+                            {step.action === 'akcyjny' && (
+                                <div className="ingredient-fields">
+                                    <div className="ingredient-field">
+                                        <label className="detail-label">Temperatura (C)</label>
+                                        <input
+                                            className="detail-input"
+                                            value={step.temperature}
+                                            onChange={e => updateStep(step.id, 'temperature', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="ingredient-field">
+                                        <label className="detail-label">Prędkość noży (0-5)</label>
+                                        <input
+                                            className="detail-input"
+                                            value={step.speed}
+                                            onChange={e => updateStep(step.id, 'speed', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="ingredient-field">
+                                        <label className="detail-label">Czas (sekundy)</label>
+                                        <input
+                                            className="detail-input"
+                                            value={step.time}
+                                            onChange={e => updateStep(step.id, 'time', e.target.value)}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="ingredient-field">
-                                    <label className="detail-label">Prędkość noży (0-5)</label>
-                                    <input
-                                        className="detail-input"
-                                        value={step.speed}
-                                        onChange={e => updateStep(step.id, 'speed', e.target.value)}
-                                    />
-                                </div>
-                                <div className="ingredient-field">
-                                    <label className="detail-label">Czas (sekundy)</label>
-                                    <input
-                                        className="detail-input"
-                                        value={step.time}
-                                        onChange={e => updateStep(step.id, 'time', e.target.value)}
-                                    />
-                                </div>
-                            </div>
+                            )}
                             <div className="ingredient-fields">
                                 <div className="ingredient-field" ref={el => { containerRefs.current[step.id] = el }}>
                                     <label className="detail-label">Składnik</label>

@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { recipes } from '../../data/recipes.ts'
+import type { ActionType } from '../../data/recipes.ts'
 import './RecipeShowcase.css'
 
 export default function RecipeShowcase() {
     const { id } = useParams()
     const navigate = useNavigate()
     const recipe = recipes.find(r => r.id === Number(id))
+    const actionLabels: Record<ActionType, string> = {
+        akcyjny: 'Akcja',
+        składnikowy: 'Składnik',
+        opisowy: 'Opis',
+    }
     const [timer, setTimer] = useState(0)
     const [maxTime, setMaxTime] = useState(0)
     const [currentStep, setCurrentStep] = useState(0)
@@ -72,31 +78,35 @@ export default function RecipeShowcase() {
                 <h1 className="showcase-title">{recipe.name}</h1>
 
                 <p className="showcase-step-label">
-                    Krok {currentStep + 1} | {recipe.steps[currentStep].action}
+                    Krok {currentStep + 1} | {actionLabels[recipe.steps[currentStep].action]}
                 </p>
 
                 <p className="showcase-description">
                     {recipe.steps[currentStep].description}
                 </p>
 
-                {recipe.steps[currentStep].ingredient && (
+                {(recipe.steps[currentStep].ingredient || recipe.steps[currentStep].action === 'składnikowy') && (
                     <p className="showcase-ingredient">
-                        Składnik: {recipe.steps[currentStep].ingredient}
+                        Składnik: {recipe.steps[currentStep].ingredient || '—'}
                         {recipe.steps[currentStep].ingredientAmount ? ` ${parseFloat(recipe.steps[currentStep].ingredientAmount)}` : ''}
                     </p>
                 )}
 
-                <div className="showcase-meta">
-                    {recipe.steps[currentStep].temperature && (
-                        <span>🌡️ {recipe.steps[currentStep].temperature}°C</span>
-                    )}
-                    {recipe.steps[currentStep].speed !== '0' && (
-                        <span>⚡ Prędkość: {recipe.steps[currentStep].speed}</span>
-                    )}
-                </div>
+                {recipe.steps[currentStep].action === 'akcyjny' && (
+                    <>
+                        <div className="showcase-meta">
+                            {recipe.steps[currentStep].temperature && (
+                                <span>🌡️ {recipe.steps[currentStep].temperature}°C</span>
+                            )}
+                            {recipe.steps[currentStep].speed !== '0' && (
+                                <span>⚡ Prędkość: {recipe.steps[currentStep].speed}</span>
+                            )}
+                        </div>
 
-                {maxTime > 0 && (
-                    <p className="showcase-timer">{formatTime(timer)}</p>
+                        {maxTime > 0 && (
+                            <p className="showcase-timer">{formatTime(timer)}</p>
+                        )}
+                    </>
                 )}
 
                 <div className="showcase-controls">

@@ -1,5 +1,7 @@
+export type ActionType = 'akcyjny' | 'składnikowy' | 'opisowy'
+
 export interface RecipeStep {
-    action: string
+    action: ActionType
     description: string
     temperature: string
     speed: string
@@ -44,10 +46,10 @@ export const recipes: Recipe[] = [
             'sól do smaku'
         ],
         steps: [
-            { action: 'Wyrabianie', description: 'Wymieszaj mąkę z drożdżami i solą, dodaj wodę i oliwę, wyrabiaj ciasto przez 10 minut.', temperature: '', speed: '3', time: '600' },
-            { action: 'Wyrastanie', description: 'Odstaw ciasto do wyrośnięcia na 1 godzinę w ciepłe miejsce.', temperature: '', speed: '0', time: '' },
-            { action: 'Pieczenie', description: 'Rozgrzej piekarnik do 220°C, włóż pizzę i piecz przez 15 minut.', temperature: '220', speed: '0', time: '900' },
-            { action: 'Dekorowanie', description: 'Udekoruj świeżą bazylią przed podaniem.', temperature: '', speed: '0', time: '' }
+            { action: 'akcyjny', description: 'Wymieszaj mąkę z drożdżami i solą, dodaj wodę i oliwę, wyrabiaj ciasto przez 10 minut.', temperature: '', speed: '3', time: '600' },
+            { action: 'opisowy', description: 'Odstaw ciasto do wyrośnięcia na 1 godzinę w ciepłe miejsce.', temperature: '', speed: '0', time: '' },
+            { action: 'akcyjny', description: 'Rozgrzej piekarnik do 220°C, włóż pizzę i piecz przez 15 minut.', temperature: '220', speed: '0', time: '900' },
+            { action: 'składnikowy', description: 'Udekoruj świeżą bazylią przed podaniem.', temperature: '', speed: '0', time: '', ingredient: 'świeża bazylia', ingredientAmount: '1' }
         ]
     },
     {
@@ -70,10 +72,10 @@ export const recipes: Recipe[] = [
             'syrop klonowy do podania'
         ],
         steps: [
-            { action: 'Mieszanie', description: 'W misce wymieszaj mąkę, cukier i proszek do pieczenia.', temperature: '', speed: '2', time: '120' },
-            { action: 'Łączenie', description: 'Dodaj jajka i mleko, mieszaj do uzyskania gładkiego ciasta.', temperature: '', speed: '3', time: '180' },
-            { action: 'Smażenie', description: 'Smaż pancakes z obu stron na złoty kolor.', temperature: '180', speed: '0', time: '240' },
-            { action: 'Podawanie', description: 'Podawaj polane syropem klonowym z kawałkiem masła.', temperature: '', speed: '0', time: '' }
+            { action: 'akcyjny', description: 'W misce wymieszaj mąkę, cukier i proszek do pieczenia.', temperature: '', speed: '2', time: '120', ingredient: 'mąka pszenna', ingredientAmount: '200' },
+            { action: 'składnikowy', description: 'Dodaj jajka i mleko, mieszaj do uzyskania gładkiego ciasta.', temperature: '', speed: '3', time: '180', ingredient: 'jajka', ingredientAmount: '2' },
+            { action: 'akcyjny', description: 'Smaż pancakes z obu stron na złoty kolor.', temperature: '180', speed: '0', time: '240' },
+            { action: 'opisowy', description: 'Podawaj polane syropem klonowym z kawałkiem masła.', temperature: '', speed: '0', time: '' }
         ]
     },
     {
@@ -95,11 +97,11 @@ export const recipes: Recipe[] = [
             'sól'
         ],
         steps: [
-            { action: 'Gotowanie', description: 'Ugotuj makaron al dente w osolonej wodzie.', temperature: '100', speed: '0', time: '480' },
-            { action: 'Podsmażanie', description: 'Pokrój guanciale w kostkę i podsmaż na patelni.', temperature: '180', speed: '0', time: '300' },
-            { action: 'Mieszanie', description: 'W misce wymieszaj jajka z tartym parmezanem.', temperature: '', speed: '2', time: '60' },
-            { action: 'Łączenie', description: 'Dodaj gorący makaron do guanciale, wlej masę jajeczną, mieszaj energicznie.', temperature: '', speed: '0', time: '120' },
-            { action: 'Podawanie', description: 'Podawaj z świeżo mielonym pieprzem.', temperature: '', speed: '0', time: '' }
+            { action: 'akcyjny', description: 'Ugotuj makaron al dente w osolonej wodzie.', temperature: '100', speed: '0', time: '480', ingredient: 'makaron spaghetti', ingredientAmount: '400' },
+            { action: 'akcyjny', description: 'Pokrój guanciale w kostkę i podsmaż na patelni.', temperature: '180', speed: '0', time: '300', ingredient: 'guanciale', ingredientAmount: '200' },
+            { action: 'akcyjny', description: 'W misce wymieszaj jajka z tartym parmezanem.', temperature: '', speed: '2', time: '60', ingredient: 'jajka', ingredientAmount: '4' },
+            { action: 'składnikowy', description: 'Dodaj gorący makaron do guanciale, wlej masę jajeczną, mieszaj energicznie.', temperature: '', speed: '0', time: '120', ingredient: 'makaron spaghetti', ingredientAmount: '400' },
+            { action: 'opisowy', description: 'Podawaj z świeżo mielonym pieprzem.', temperature: '', speed: '0', time: '' }
         ]
     },
     {
@@ -123,9 +125,9 @@ export const recipes: Recipe[] = [
             'oregano'
         ],
         steps: [
-            { action: 'Krojenie', description: 'Pokrój pomidory, ogórka i cebulę w kostkę.', temperature: '', speed: '3', time: '180' },
-            { action: 'Łączenie', description: 'Dodaj oliwki i pokruszoną fetę.', temperature: '', speed: '0', time: '' },
-            { action: 'Doprawianie', description: 'Skrop oliwą i sokiem z cytryny, posyp oregano i delikatnie wymieszaj.', temperature: '', speed: '1', time: '60' }
+            { action: 'akcyjny', description: 'Pokrój pomidory, ogórka i cebulę w kostkę.', temperature: '', speed: '3', time: '180', ingredient: 'pomidory', ingredientAmount: '2' },
+            { action: 'składnikowy', description: 'Dodaj oliwki i pokruszoną fetę.', temperature: '', speed: '0', time: '', ingredient: 'ser feta', ingredientAmount: '200' },
+            { action: 'składnikowy', description: 'Skrop oliwą i sokiem z cytryny, posyp oregano i delikatnie wymieszaj.', temperature: '', speed: '1', time: '60', ingredient: 'oliwa z oliwek', ingredientAmount: '3' }
         ]
     },
     {
@@ -149,12 +151,12 @@ export const recipes: Recipe[] = [
             'sos BBQ'
         ],
         steps: [
-            { action: 'Formowanie', description: 'Uformuj kotlety z mięsa, dopraw solą i pieprzem.', temperature: '', speed: '0', time: '300' },
-            { action: 'Grillowanie', description: 'Smaż kotlety po 4 minuty z każdej strony.', temperature: '200', speed: '0', time: '480' },
-            { action: 'Topienie', description: 'Połóż plaster sera na każdym kotlecie.', temperature: '200', speed: '0', time: '60' },
-            { action: 'Podpiekanie', description: 'Podpiecz bułki na grillu.', temperature: '180', speed: '0', time: '120' },
-            { action: 'Składanie', description: 'Złóż burgery: bułka, sos, sałata, kotlet, pomidor, cebula.', temperature: '', speed: '0', time: '' },
-            { action: 'Podawanie', description: 'Podawaj od razu.', temperature: '', speed: '0', time: '' }
+            { action: 'składnikowy', description: 'Uformuj kotlety z mięsa, dopraw solą i pieprzem.', temperature: '', speed: '0', time: '300', ingredient: 'mięso wołowe mielone', ingredientAmount: '500' },
+            { action: 'akcyjny', description: 'Smaż kotlety po 4 minuty z każdej strony.', temperature: '200', speed: '0', time: '480', ingredient: 'mięso wołowe mielone', ingredientAmount: '500' },
+            { action: 'akcyjny', description: 'Połóż plaster sera na każdym kotlecie.', temperature: '200', speed: '0', time: '60', ingredient: 'ser cheddar', ingredientAmount: '4' },
+            { action: 'akcyjny', description: 'Podpiecz bułki na grillu.', temperature: '180', speed: '0', time: '120', ingredient: 'bułki brioche', ingredientAmount: '4' },
+            { action: 'składnikowy', description: 'Złóż burgery: bułka, sos, sałata, kotlet, pomidor, cebula.', temperature: '', speed: '0', time: '', ingredient: 'bułki brioche', ingredientAmount: '4' },
+            { action: 'opisowy', description: 'Podawaj od razu.', temperature: '', speed: '0', time: '' }
         ]
     },
     {
@@ -177,12 +179,12 @@ export const recipes: Recipe[] = [
             'likier amaretto (opcjonalnie)'
         ],
         steps: [
-            { action: 'Separacja', description: 'Oddziel żółtka od białek.', temperature: '', speed: '0', time: '120' },
-            { action: 'Ubijanie', description: 'Żółtka utrzyj z cukrem na puszystą masę, dodaj mascarpone.', temperature: '', speed: '4', time: '300' },
-            { action: 'Białka', description: 'Ubij białka na sztywną pianę i wmieszaj do masy.', temperature: '', speed: '5', time: '240' },
-            { action: 'Układanie', description: 'Zanurzaj biszkopty w kawie i układaj w naczyniu na przemian z kremem.', temperature: '', speed: '0', time: '600' },
-            { action: 'Chłodzenie', description: 'Schłódź w lodówce minimum 4 godziny.', temperature: '4', speed: '0', time: '14400' },
-            { action: 'Dekorowanie', description: 'Przed podaniem posyp kakao.', temperature: '', speed: '0', time: '' }
+            { action: 'akcyjny', description: 'Oddziel żółtka od białek.', temperature: '', speed: '0', time: '120' },
+            { action: 'akcyjny', description: 'Żółtka utrzyj z cukrem na puszystą masę, dodaj mascarpone.', temperature: '', speed: '4', time: '300', ingredient: 'mascarpone', ingredientAmount: '500' },
+            { action: 'akcyjny', description: 'Ubij białka na sztywną pianę i wmieszaj do masy.', temperature: '', speed: '5', time: '240', ingredient: 'jajka', ingredientAmount: '4' },
+            { action: 'składnikowy', description: 'Zanurzaj biszkopty w kawie i układaj w naczyniu na przemian z kremem.', temperature: '', speed: '0', time: '600', ingredient: 'biszkopty podłużne', ingredientAmount: '200' },
+            { action: 'opisowy', description: 'Schłódź w lodówce minimum 4 godziny.', temperature: '4', speed: '0', time: '14400' },
+            { action: 'składnikowy', description: 'Przed podaniem posyp kakao.', temperature: '', speed: '0', time: '', ingredient: 'kakao', ingredientAmount: '2' }
         ]
     }
 ]
