@@ -4,6 +4,7 @@ import MyRecipePage from './components/MyRecipePage/MyRecipePage.tsx';
 import MyProductsPage from './components/MyProductsPage/MyProductsPage.tsx';
 import RecipeDetail from './components/RecipeDetail/RecipeDetail.tsx';
 import RecipeView from './components/RecipeView/RecipeView.tsx';
+import RecipeShowcase from './components/RecipeShowcase/RecipeShowcase.tsx';
 import UserPage from './components/UserPage/UserPage.tsx';
 import './App.css'
 
@@ -15,6 +16,7 @@ function App() {
         <Route path="/moje-produkty" element={<MyProductsPage />} />
         <Route path="/nowy-przepis" element={<RecipeDetail />} />
         <Route path="/przepis/:id" element={<RecipeView />} />
+        <Route path="/przepis/:id/showcase" element={<RecipeShowcase />} />
         <Route path="/konto" element={<UserPage />} />
       </Routes>
   );
