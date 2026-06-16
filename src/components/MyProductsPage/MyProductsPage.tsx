@@ -1,111 +1,138 @@
-import { useState } from 'react'
-import Navbar from "../Navbar/Navbar.tsx"
-import SearchBar from "../SearchBar/SearchBar.tsx"
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Navbar from '../Navbar/Navbar.tsx'
+import { useAuth } from '../../context/AuthContext.tsx'
+import { ApiError, productApi, type Product } from '../../api'
 import './MyProductsPage.css'
 
-interface Product {
-    id: number
-    name: string
-    category: string
-}
+export default function MyProductsPage() {
+  const navigate = useNavigate()
+  const { user, loading: authLoading } = useAuth()
+  const [products, setProducts] = useState<Product[]>([])
+  const [showModal, setShowModal] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newCategory, setNewCategory] = useState('')
+  const [error, setError] = useState('')
+  const [modalError, setModalError] = useState('')
 
-const initialProducts: Product[] = [
-    { id: 1, name: 'Marchewka', category: 'warzywa' },
-    { id: 2, name: 'Pomidor', category: 'warzywa' },
-    { id: 3, name: 'Ogórek', category: 'warzywa' },
-    { id: 4, name: 'Cebula', category: 'warzywa' },
-    { id: 5, name: 'Papryka', category: 'warzywa' },
-    { id: 6, name: 'Jabłko', category: 'owoce' },
-    { id: 7, name: 'Banan', category: 'owoce' },
-    { id: 8, name: 'Pomarańcza', category: 'owoce' },
-    { id: 9, name: 'Truskawka', category: 'owoce' },
-    { id: 10, name: 'Winogrona', category: 'owoce' },
-    { id: 11, name: 'Kurczak', category: 'mięso' },
-    { id: 12, name: 'Wołowina', category: 'mięso' },
-    { id: 13, name: 'Wieprzowina', category: 'mięso' },
-    { id: 14, name: 'Łosoś', category: 'mięso' },
-]
+  const openModal = () => {
+    setNewName('')
+    setNewCategory('')
+    setModalError('')
+    setShowModal(true)
+  }
 
-export default function MyProductsPage(){
-    const [products, setProducts] = useState(initialProducts)
-    const [showModal, setShowModal] = useState(false)
-    const [newName, setNewName] = useState('')
-    const [newCategory, setNewCategory] = useState('')
+  const closeModal = () => {
+    setModalError('')
+    setShowModal(false)
+  }
 
-    const categories = [...new Set(products.map(p => p.category))]
+  useEffect(() => {
+    if (!authLoading && !user) navigate('/login')
+  }, [authLoading, user, navigate])
 
-    const deleteProduct = (id: number) => {
-        setProducts(prev => prev.filter(p => p.id !== id))
+  const load = () => {
+    productApi.list().then(setProducts).catch(() => setProducts([]))
+  }
+
+  useEffect(() => {
+    if (user) load()
+  }, [user])
+
+  const categories = useMemo(
+    () => [...new Set(products.map((p) => p.category))].sort(),
+    [products],
+  )
+
+  const deleteProduct = async (id: string) => {
+    try {
+      await productApi.remove(id)
+      setProducts((prev) => prev.filter((p) => p._id !== id))
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Nie udało się usunąć produktu')
     }
+  }
 
-    const addProduct = () => {
-        if (!newName.trim() || !newCategory.trim()) return
-        const nextId = Math.max(...products.map(p => p.id), 0) + 1
-        setProducts(prev => [...prev, { id: nextId, name: newName.trim(), category: newCategory.trim() }])
-        setNewName('')
-        setNewCategory('')
-        setShowModal(false)
+  const addProduct = async () => {
+    if (!newName.trim() || !newCategory.trim()) {
+      setModalError('Podaj nazwę i kategorię produktu')
+      return
     }
+    try {
+      const created = await productApi.create(newName.trim(), newCategory.trim())
+      setProducts((prev) => [...prev, created])
+      closeModal()
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409)
+        setModalError('Produkt o tej nazwie już istnieje')
+      else setModalError(err instanceof ApiError ? err.message : 'Nie udało się dodać produktu')
+    }
+  }
 
-    return (
-        <>
-            <Navbar />
-            <SearchBar />
-            <div className="add-bar">
-                <button className="add-product-btn" onClick={() => setShowModal(true)}>
-                    + Dodaj produkt
-                </button>
-            </div>
-            <div className="products-content">
-                {categories.map(category => (
-                    <div key={category} className="product-section">
-                        <h2 className="category-title">{category}</h2>
-                        <div className="product-chips">
-                            {products
-                                .filter(p => p.category === category)
-                                .map(product => (
-                                    <span key={product.id} className="product-chip">
-                                        {product.name}
-                                        <button
-                                            className="chip-delete"
-                                            onClick={() => deleteProduct(product.id)}
-                                        >
-                                            ✖
-                                        </button>
-                                    </span>
-                                ))}
-                        </div>
-                    </div>
+  return (
+    <>
+      <Navbar />
+      <div className="add-bar">
+        <button className="add-product-btn" onClick={openModal}>
+          + Dodaj produkt
+        </button>
+      </div>
+      {error && <p className="products-error">{error}</p>}
+      <div className="products-content">
+        {categories.map((category) => (
+          <div key={category} className="product-section">
+            <h2 className="category-title">{category}</h2>
+            <div className="product-chips">
+              {products
+                .filter((p) => p.category === category)
+                .map((product) => (
+                  <span
+                    key={product._id}
+                    className={`product-chip${product.scope === 'user' ? ' own' : ''}`}
+                  >
+                    {product.name}
+                    {product.scope === 'global' && <em className="global-badge">globalny</em>}
+                    {product.scope === 'user' && (
+                      <button className="chip-delete" onClick={() => deleteProduct(product._id)}>
+                        ✖
+                      </button>
+                    )}
+                  </span>
                 ))}
             </div>
+          </div>
+        ))}
+        {products.length === 0 && <p className="muted">Brak produktów.</p>}
+      </div>
 
-            {showModal && (
-                <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <h3 className="modal-title">Dodaj produkt</h3>
-                        <input
-                            className="modal-input"
-                            placeholder="Nazwa produktu"
-                            value={newName}
-                            onChange={e => setNewName(e.target.value)}
-                        />
-                        <input
-                            className="modal-input"
-                            placeholder="Kategoria"
-                            value={newCategory}
-                            onChange={e => setNewCategory(e.target.value)}
-                        />
-                        <div className="modal-actions">
-                            <button className="modal-btn cancel" onClick={() => setShowModal(false)}>
-                                Anuluj
-                            </button>
-                            <button className="modal-btn confirm" onClick={addProduct}>
-                                Dodaj
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </>
-    )
+      {showModal && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3 className="modal-title">Dodaj produkt</h3>
+            <input
+              className="modal-input"
+              placeholder="Nazwa produktu"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+            />
+            <input
+              className="modal-input"
+              placeholder="Kategoria"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+            />
+            {modalError && <p className="modal-error">{modalError}</p>}
+            <div className="modal-actions">
+              <button className="modal-btn cancel" onClick={closeModal}>
+                Anuluj
+              </button>
+              <button className="modal-btn confirm" onClick={addProduct}>
+                Dodaj
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
 }
