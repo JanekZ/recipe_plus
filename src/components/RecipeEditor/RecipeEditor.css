@@ -1,0 +1,372 @@
+.editor {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.editor-header h1 {
+    margin: 0;
+    font-size: 1.7rem;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.editor-error {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    background: #ffebee;
+    color: #c62828;
+    border-radius: 0.6rem;
+}
+
+.editor-card {
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.editor-card h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.75rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.field input,
+.field select,
+.field textarea {
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    color: #000;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    outline: none;
+    border-color: #F17939;
+}
+
+/* Buttons -------------------------------------------------------------- */
+.btn {
+    border: none;
+    border-radius: 0.6rem;
+    padding: 0.55rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: #F6F4F4;
+    color: #000;
+}
+
+.btn.primary {
+    background: #F17939;
+    color: #fff;
+}
+
+.btn.ghost {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+}
+
+.btn.ai {
+    align-self: flex-start;
+    background: #FF9F6C;
+    color: #fff;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.image-preview {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.image-preview img {
+    max-height: 180px;
+    max-width: 100%;
+    border-radius: 0.6rem;
+    border: 1px solid #eee;
+    object-fit: cover;
+}
+
+/* Ingredients ---------------------------------------------------------- */
+.ingredient-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.ingredient-add {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.ingredient-add input,
+.ingredient-add select {
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.ingredient-add > input:first-child {
+    flex: 1;
+    min-width: 160px;
+}
+
+.ingredient-qty {
+    width: 90px;
+}
+
+.ingredient-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.ingredient-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #F6F4F4;
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.95rem;
+}
+
+.custom-badge {
+    margin-left: 0.5rem;
+    font-style: normal;
+    font-size: 0.7rem;
+    color: #F17939;
+    background: #fff;
+    border: 1px solid #ffd9bf;
+    border-radius: 0.4rem;
+    padding: 1px 6px;
+}
+
+.muted {
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.chip-remove,
+.chip-delete {
+    background: none;
+    border: none;
+    color: #c62828;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+/* Steps ---------------------------------------------------------------- */
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.step-card {
+    border: 1px solid #eee;
+    border-left: 4px solid #F17939;
+    border-radius: 0.7rem;
+    padding: 0.75rem 0.9rem;
+    background: #fff;
+}
+
+.step-card.dragging {
+    opacity: 0.5;
+    border-style: dashed;
+}
+
+.step-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+}
+
+.drag-handle {
+    cursor: grab;
+    color: #bbb;
+    font-size: 1.1rem;
+}
+
+.step-number {
+    font-weight: 700;
+}
+
+.step-type-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    background: #F6F4F4;
+    border-radius: 0.4rem;
+    padding: 2px 8px;
+}
+
+/* Per-type left-border accent */
+.step-card.type-ingredient {
+    border-left-color: #2e7d32;
+}
+
+.step-card.type-ingredient .step-type-badge {
+    color: #2e7d32;
+    background: #e8f5e9;
+}
+
+.step-card.type-action {
+    border-left-color: #F17939;
+}
+
+.step-card.type-action .step-type-badge {
+    color: #F17939;
+    background: #fff1e8;
+}
+
+.step-card.type-description {
+    border-left-color: #6a7b8c;
+}
+
+.step-card.type-description .step-type-badge {
+    color: #4a5b6c;
+    background: #eef2f6;
+}
+
+.step-head-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 0.3rem;
+}
+
+.step-head-actions button {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.4rem;
+    background: #fff;
+    cursor: pointer;
+}
+
+.step-head-actions button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.step-head-actions .danger {
+    color: #c62828;
+    border-color: #ffd0d0;
+}
+
+.step-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.field.instruction {
+    flex: 1;
+}
+
+.appliance-params {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.6rem;
+    background: #fafafa;
+    border-radius: 0.5rem;
+    padding: 0.6rem;
+}
+
+.duration-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.duration-inputs input {
+    width: 60px;
+    padding: 0.55rem 0.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+}
+
+.add-step {
+    align-self: flex-start;
+}
+
+.add-step-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Save bar ------------------------------------------------------------- */
+.save-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.visibility-check {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+}
+
+.save-actions {
+    display: flex;
+    gap: 0.5rem;
+}

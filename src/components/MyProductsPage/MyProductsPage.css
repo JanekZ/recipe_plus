@@ -55,6 +55,36 @@
     color: #333333;
 }
 
+.product-chip.own {
+    border-color: #F17939;
+}
+
+.global-badge {
+    font-style: normal;
+    font-size: 0.65rem;
+    color: #888;
+    background: #F6F4F4;
+    border-radius: 0.4rem;
+    padding: 1px 6px;
+}
+
+.products-error {
+    padding: 0.75rem 10%;
+    color: #c62828;
+    background-color: #F6F4F4;
+    margin: 0;
+}
+
+.modal-error {
+    margin: 0;
+    color: #c62828;
+    font-size: 0.9rem;
+}
+
+.products-content .muted {
+    color: #999;
+}
+
 .chip-delete {
     background: none;
     border: none;

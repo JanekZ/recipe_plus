@@ -6,17 +6,30 @@
     justify-content: center;
 }
 
-.bar-content {
+.bar-wrapper {
     width: 80%;
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
     padding: 1rem 0rem;
+}
+
+.bar-content {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
 }
 
 .filters-button {
     font-size: 1.25rem;
     font-weight: 300;
     color: #a9a9a9;
+    cursor: pointer;
+}
+
+.filters-button.open {
+    color: #F17939;
+    font-weight: 600;
 }
 
 .input-container, .filters-button{
@@ -27,10 +40,57 @@
     display: flex;
 }
 
+.input-container {
+    flex: 1;
+}
+
+.input-container input {
+    flex: 1;
+}
+
 .input-container input, .input-container button {
     background: none;
     border: none;
     font-size: 1.25rem;
     font-weight: 300;
     color: #a9a9a9;
+}
+
+/* Typed text is black; the placeholder stays gray. */
+.input-container input {
+    color: #000000;
+}
+
+.input-container input::placeholder {
+    color: #a9a9a9;
+}
+
+.input-container button {
+    cursor: pointer;
+}
+
+.filters-panel {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filters-panel input {
+    flex: 1;
+    min-width: 140px;
+    padding: 0.55rem 0.7rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    background-color: #F6F4F4;
+}
+
+.apply-button {
+    padding: 0.55rem 1.2rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+    color: #F17939;
+    font-weight: 600;
+    cursor: pointer;
 }

@@ -1,5 +1,3 @@
-version: '3.9'
-
 volumes:
   postgres-data:
   mongo-data:
@@ -27,6 +25,7 @@ services:
       - auth-service
     networks:
       - recipe-network
+    restart: unless-stopped
 
   backend:
     build:
@@ -39,15 +38,17 @@ services:
       - /app/node_modules
     environment:
       - PORT=3001
-      - POSTGRES_URL=postgresql://recipe_user:recipe_pass@postgres:5432/recipe_db
       - MONGO_URL=mongodb://mongo:27017/recipe_ingredients
       - JWT_SECRET=${JWT_SECRET}
-      - AUTH_SERVICE_URL=http://auth-service:3002
+      - AI_SERVICE_URL=http://ai-service:8000
     depends_on:
-      - postgres
-      - mongo
+      mongo:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
     networks:
       - recipe-network
+    restart: unless-stopped
 
   auth-service:
     build:
@@ -64,9 +65,11 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=7d
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - recipe-network
+    restart: unless-stopped
 
   ai-service:
     build:
@@ -77,12 +80,12 @@ services:
     volumes:
       - ./ai-service:/app
     environment:
+      # klucze dla modeli
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - MONGO_URL=mongodb://mongo:27017/recipe_ingredients
-    depends_on:
-      - mongo
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
     networks:
       - recipe-network
+    restart: unless-stopped
 
   postgres:
     image: postgres:16-alpine
@@ -95,16 +98,28 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U recipe_user -d recipe_db']
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - recipe-network
+    restart: unless-stopped
 
   mongo:
-    image: mongo:7-jammy
+    image: mongo:7
     ports:
       - '27017:27017'
     environment:
       - MONGO_INITDB_DATABASE=recipe_ingredients
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - recipe-network
+    restart: unless-stopped
