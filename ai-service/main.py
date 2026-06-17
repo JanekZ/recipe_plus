@@ -1,21 +1,16 @@
-"""
-Nie działa, do zmiany modelu
-"""
-
-import json
 import os
-from typing import Optional
-
-import httpx
-from fastapi import FastAPI
+import json
+from typing import Optional, List
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+import httpx
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-OPENAI_URL = "https://api.openai.com/v1/chat/completions"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-latest").strip()
 
-app = FastAPI(title="DreamFoodX AI Service")
+app = FastAPI(title="DreamFoodX Gemini AI Service")
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,92 +19,123 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class ChatRequest(BaseModel):
+    prompt: str
 
-class GenerateRequest(BaseModel):
-    ingredients: list[str] = Field(default_factory=list)
+class AiGenerateInput(BaseModel):
+    ingredients: List[str]
     dishName: Optional[str] = None
-    language: str = "pl"
-
-
-class GenerateResponse(BaseModel):
-    description: str
-    source: str  # "openai" | "fallback"
+    language: Optional[str] = "pl"
 
 
 @app.get("/health")
 def health():
-    return {
-        "status": "ok",
-        "service": "ai-service",
-        "llm": "openai" if OPENAI_API_KEY else "fallback",
-    }
+    return {"status": "ok", "service": "ai-service-gemini", "configured": bool(GEMINI_API_KEY)}
 
 
-def _build_prompt(req: GenerateRequest) -> str:
-    dish = req.dishName or "potrawa"
-    ingredients = ", ".join(i for i in req.ingredients if i.strip()) or "podane składniki"
-    return (
-        f"Jesteś szefem kuchni piszącym dla aplikacji z przepisami na urządzenie "
-        f"DreamFoodX. Język odpowiedzi: {req.language}. "
-        f"Na podstawie nazwy dania \"{dish}\" i składników ({ingredients}) napisz "
-        f"zachęcający opis dania (2-3 zdania). "
-        f"Zwróć WYŁĄCZNIE poprawny JSON o kształcie "
-        f'{{"description": "..."}} bez dodatkowego tekstu.'
+@app.post("/chat/generate")
+async def generate_recipe(req: ChatRequest):
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key is not configured.")
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+
+    flat_prompt = (
+        "Jesteś genialnym Szefem Kuchni dla robota kuchennego DreamFoodX.\n"
+        "ZWROT MA BYĆ WYŁĄCZNIE CZYSTYM TEKSTEM JSON. Nie dodawaj ```json, nie dodawaj ``` na końcu, nie pisz żadnych wstępów!\n"
+        "Wszystkie teksty w polach muszą być w języku polskim.\n\n"
+        "Wygeneruj przepis jako obiekt JSON o dokładnie takiej strukturze:\n"
+        "{\n"
+        "  \"name\": \"Nazwa dania po polsku\",\n"
+        "  \"description\": \"Krótki, apetyczny opis po polsku\",\n"
+        "  \"category\": \"Obiad\",\n"
+        "  \"difficulty\": \"medium\",\n"
+        "  \"estimatedTimeSeconds\": 1800,\n"
+        "  \"portions\": 4,\n"
+        "  \"isPublic\": false,\n"
+        "  \"steps\": [\n"
+        "    {\n"
+        "      \"type\": \"action\",\n"
+        "      \"action\": \"mix\",\n"
+        "      \"temperatureC\": 0,\n"
+        "      \"bladeSpeed\": 3,\n"
+        "      \"durationSeconds\": 30,\n"
+        "      \"description\": \"Miksowanie składników w misie.\",\n"
+        "      \"items\": []\n"
+        "    }\n"
+        "  ]\n"
+        "}\n\n"
+        "ŚCISŁE ZASADY (inaczej przepis zostanie odrzucony):\n"
+        "- Pole \"difficulty\" MUSI być jedną z: easy, medium, hard.\n"
+        "- Dla kroku typu \"action\" pole \"action\" MUSI być DOKŁADNIE jedną z (po angielsku): "
+        "mix, cook, fry, chop, blend, knead, steam, weigh, warm, rest. Nie używaj innych słów (np. boil, bake, saute).\n"
+        "- W krokach \"action\": temperatureC to liczba całkowita 0-160, bladeSpeed to liczba całkowita 0-10, "
+        "durationSeconds to dodatnia liczba całkowita (w sekundach).\n"
+        "- Krok typu \"ingredient\" musi mieć niepustą tablicę \"items\"; każdy element ma: "
+        "\"name\" (tekst), \"quantity\" (liczba), \"unit\" (jedna z: g, kg, ml, l, tsp, tbsp, cup, pcs).\n"
+        "- Krok typu \"description\" musi mieć niepuste pole \"description\".\n"
+        "- Dodaj kroki typu \"ingredient\" z realnymi składnikami i ilościami, a nie tylko opisy.\n\n"
+        f"Użytkownik prosi o przepis na podstawie: {req.prompt}"
     )
 
-
-async def _generate_with_openai(req: GenerateRequest) -> Optional[GenerateResponse]:
-    """Return a response from OpenAI, or None on any failure (caller falls back)."""
-    headers = {
-        "Authorization": f"Bearer {OPENAI_API_KEY}",
-        "Content-Type": "application/json",
-    }
     payload = {
-        "model": OPENAI_MODEL,
-        "messages": [
-            {"role": "system", "content": "You write concise culinary copy and always reply with valid JSON."},
-            {"role": "user", "content": _build_prompt(req)},
-        ],
-        "temperature": 0.8,
-        "response_format": {"type": "json_object"},
+        "contents": [{
+            "parts": [{"text": flat_prompt}]
+        }]
     }
-    try:
-        async with httpx.AsyncClient(timeout=20.0) as client:
-            res = await client.post(OPENAI_URL, headers=headers, json=payload)
-            res.raise_for_status()
-            content = res.json()["choices"][0]["message"]["content"]
-            data = json.loads(content)
-            description = str(data.get("description", "")).strip()
-            if not description:
-                return None
-            return GenerateResponse(description=description, source="openai")
-    except Exception as exc:
-        print(f"[ai] openai call failed, using fallback: {exc}")
-        return None
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(url, json=payload, timeout=30.0)
+
+            if response.status_code != 200:
+                print(f"[GEMINI ERROR]: {response.text}")
+                raise HTTPException(status_code=response.status_code, detail=response.text)
+
+            data = response.json()
+            raw_text = data['candidates'][0]['content']['parts'][0]['text'].strip()
+            start_idx = raw_text.find('{')
+            end_idx = raw_text.rfind('}')
+
+            if start_idx == -1 or end_idx == -1:
+                raise ValueError("Model nie zwrócił prawidłowego obiektu JSON.")
+
+            clean_json = raw_text[start_idx:end_idx + 1]
+            return JSONResponse(content=json.loads(clean_json))
+
+        except Exception as e:
+            print(f"\n[CRITICAL ERROR]: {str(e)}\n")
+            raise HTTPException(status_code=500, detail=str(e))
 
 
-def _generate_fallback(req: GenerateRequest) -> GenerateResponse:
-    dish = req.dishName or "To danie"
-    items = [i.strip() for i in req.ingredients if i.strip()]
-    if items:
-        listed = ", ".join(items[:-1]) + (f" i {items[-1]}" if len(items) > 1 else items[0])
-        description = (
-            f"{dish} łączy w sobie {listed}, tworząc aromatyczną kompozycję smaków. "
-            f"Przygotujesz je bez wysiłku dzięki precyzyjnej kontroli temperatury i "
-            f"prędkości ostrzy urządzenia DreamFoodX."
-        )
-    else:
-        description = (
-            f"{dish} to prosty przepis przygotowany od początku do końca w urządzeniu DreamFoodX."
-        )
+@app.post("/generate")
+async def generate_description_endpoint(req: AiGenerateInput):
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key is not configured.")
 
-    return GenerateResponse(description=description, source="fallback")
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+    ingredients_str = ", ".join(req.ingredients)
+    dish_info = f" dla dania '{req.dishName}'" if req.dishName else ""
 
+    prompt = (
+        f"Wygeneruj apetyczny, profesjonalny opis potrawy po polsku{dish_info} "
+        f"na podstawie następujących składników: {ingredients_str}. "
+        f"Opis powinien mieć maksymalnie 3-4 zdania."
+    )
 
-@app.post("/generate", response_model=GenerateResponse)
-async def generate(req: GenerateRequest) -> GenerateResponse:
-    if OPENAI_API_KEY:
-        result = await _generate_with_openai(req)
-        if result is not None:
-            return result
-    return _generate_fallback(req)
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}]
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(url, json=payload, timeout=30.0)
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail=response.text)
+
+            data = response.json()
+            text_result = data['candidates'][0]['content']['parts'][0]['text'].strip()
+            return JSONResponse(content={"description": text_result})
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    return None
