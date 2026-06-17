@@ -48,48 +48,18 @@
     align-items: center;
     gap: 0.4rem;
     background-color: #FFFFFF;
-    border: 1px solid #dddddd;
+    border: 1px solid #ddd;
     border-radius: 2rem;
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
-    color: #333333;
-}
-
-.product-chip.own {
-    border-color: #F17939;
-}
-
-.global-badge {
-    font-style: normal;
-    font-size: 0.65rem;
-    color: #888;
-    background: #F6F4F4;
-    border-radius: 0.4rem;
-    padding: 1px 6px;
-}
-
-.products-error {
-    padding: 0.75rem 10%;
-    color: #c62828;
-    background-color: #F6F4F4;
-    margin: 0;
-}
-
-.modal-error {
-    margin: 0;
-    color: #c62828;
-    font-size: 0.9rem;
-}
-
-.products-content .muted {
-    color: #999;
+    color: #333;
 }
 
 .chip-delete {
     background: none;
     border: none;
     font-size: 0.75rem;
-    color: #999999;
+    color: #999;
     cursor: pointer;
     padding: 0;
     line-height: 1;
@@ -128,6 +98,13 @@
     margin: 0;
 }
 
+.modal-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: -0.5rem;
+}
+
 .modal-input {
     font-size: 1rem;
     padding: 0.6rem 0.8rem;
@@ -157,7 +134,7 @@
 
 .modal-btn.cancel {
     background-color: #F6F4F4;
-    color: #555555;
+    color: #555;
 }
 
 .modal-btn.confirm {

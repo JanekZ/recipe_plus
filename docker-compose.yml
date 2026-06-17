@@ -12,7 +12,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '5173:5173'
+      - "5173:5173"
     volumes:
       - .:/app
       - /app/node_modules
@@ -32,7 +32,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - '3001:3001'
+      - "3001:3001"
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -55,7 +55,7 @@ services:
       context: ./auth-service
       dockerfile: Dockerfile
     ports:
-      - '3002:3002'
+      - "3002:3002"
     volumes:
       - ./auth-service:/app
       - /app/node_modules
@@ -76,13 +76,11 @@ services:
       context: ./ai-service
       dockerfile: Dockerfile
     ports:
-      - '8000:8000'
+      - "8000:8000"
     volumes:
       - ./ai-service:/app
     environment:
-      # klucze dla modeli
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - GEMINI_API_KEY=AQ.Ab8RN6J11TeKXEUkHTV5VXOHbH6PDaUO9h6OacPWjAylEuTDpw
     networks:
       - recipe-network
     restart: unless-stopped
@@ -90,7 +88,7 @@ services:
   postgres:
     image: postgres:16-alpine
     ports:
-      - '5432:5432'
+      - "5432:5432"
     environment:
       - POSTGRES_USER=recipe_user
       - POSTGRES_PASSWORD=recipe_pass
@@ -99,7 +97,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U recipe_user -d recipe_db']
+      test: ["CMD-SHELL", "pg_isready -U recipe_user -d recipe_db"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -110,13 +108,13 @@ services:
   mongo:
     image: mongo:7
     ports:
-      - '27017:27017'
+      - "27017:27017"
     environment:
       - MONGO_INITDB_DATABASE=recipe_ingredients
     volumes:
       - mongo-data:/data/db
     healthcheck:
-      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
       interval: 5s
       timeout: 5s
       retries: 10

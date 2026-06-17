@@ -1,181 +1,146 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import Navbar from '../Navbar/Navbar.tsx'
-import { useAuth } from '../../context/AuthContext.tsx'
-import {
-  ACTION_LABELS,
-  DIFFICULTY_LABELS,
-  ApiError,
-  recipeApi,
-  type Recipe,
-} from '../../api'
-import { secondsToMMSS } from '../../utils/time.ts'
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { recipes } from '../../data/recipes.ts'
+import type { ActionType } from '../../data/recipes.ts'
 import './RecipeShowcase.css'
 
 export default function RecipeShowcase() {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const { user } = useAuth()
-  const [recipe, setRecipe] = useState<Recipe | null>(null)
-  const [error, setError] = useState('')
-  const [confirmDelete, setConfirmDelete] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [delError, setDelError] = useState('')
-
-  useEffect(() => {
-    if (!id) return
-    recipeApi
-      .get(id)
-      .then(setRecipe)
-      .catch(() => setError('Nie znaleziono przepisu lub jest prywatny'))
-  }, [id])
-
-  const handleDelete = async () => {
-    if (!recipe) return
-    setDeleting(true)
-    setDelError('')
-    try {
-      await recipeApi.remove(recipe._id)
-      navigate('/moje-przepisy')
-    } catch (err) {
-      setDelError(err instanceof ApiError ? err.message : 'Nie udało się usunąć przepisu')
-      setDeleting(false)
+    const { id } = useParams()
+    const navigate = useNavigate()
+    const recipe = recipes.find(r => r.id === Number(id))
+    const actionLabels: Record<ActionType, string> = {
+        akcyjny: 'Akcja',
+        składnikowy: 'Składnik',
+        opisowy: 'Opis',
     }
-  }
+    const [timer, setTimer] = useState(0)
+    const [maxTime, setMaxTime] = useState(0)
+    const [currentStep, setCurrentStep] = useState(0)
+    const [isRunning, setIsRunning] = useState(false)
 
-  if (error) {
+    useEffect(() => {
+        if (!recipe) return
+        const t = parseInt(recipe.steps[0].time) || 0
+        setTimer(t)
+        setMaxTime(t)
+        setCurrentStep(0)
+        setIsRunning(true)
+    }, [])
+
+    useEffect(() => {
+        if (!recipe) return
+        const step = recipe.steps[currentStep]
+        if (!step) return
+        const t = parseInt(step.time) || 0
+        setTimer(t)
+        setMaxTime(t)
+        setIsRunning(true)
+    }, [currentStep])
+
+    useEffect(() => {
+        if (timer <= 0 || !isRunning) return
+        const interval = setInterval(() => setTimer(t => t - 1), 1000)
+        return () => clearInterval(interval)
+    }, [timer, isRunning])
+
+    useEffect(() => {
+        if (timer === 0 && recipe && maxTime > 0 && currentStep < recipe.steps.length - 1) {
+            const stepTime = parseInt(recipe.steps[currentStep].time) || 0
+            if (stepTime !== maxTime) return
+            setCurrentStep(s => s + 1)
+        }
+    }, [timer])
+
+    const formatTime = (s: number): string => {
+        const m = Math.floor(s / 60)
+        const sec = s % 60
+        return `${m}:${sec.toString().padStart(2, '0')}`
+    }
+
+    if (!recipe) {
+        return (
+            <div className="showcase-page">
+                <p className="showcase-not-found">Przepis nie znaleziony</p>
+                <button className="showcase-back-btn" onClick={() => navigate(-1)}>Wróć</button>
+            </div>
+        )
+    }
+
+    const progress = maxTime > 0 ? (1 - timer / maxTime) * 100 : 0
+
     return (
-      <>
-        <Navbar />
-        <p className="showcase-error">{error}</p>
-      </>
-    )
-  }
+        <div className="showcase-page">
+            <div className="showcase-progress-bar" style={{ width: `${progress}%` }} />
 
-  if (!recipe) {
-    return (
-      <>
-        <Navbar />
-        <p className="showcase-loading">Wczytywanie…</p>
-      </>
-    )
-  }
+            <button className="showcase-exit" onClick={() => navigate(`/przepis/${id}`)}>×</button>
 
-  const totalMinutes = Math.round(recipe.estimatedTimeSeconds / 60)
-  const isOwner = user?.id === recipe.authorId
+            <div className="showcase-body">
+                <h1 className="showcase-title">{recipe.name}</h1>
 
-  return (
-    <>
-      <Navbar />
-      <article className="showcase">
-        {/* ---- Start screen ---- */}
-        <header className="showcase-hero">
-          {recipe.image && <img className="showcase-image" src={recipe.image} alt={recipe.name} />}
-          <div className="showcase-hero-body">
-            <span className="showcase-category">{recipe.category}</span>
-            <h1>{recipe.name}</h1>
-            <p className="showcase-description">{recipe.description}</p>
-            <div className="showcase-meta">
-              <span>🕐 {totalMinutes} min</span>
-              <span>👥 {recipe.portions} porcji</span>
-              <span>📊 {DIFFICULTY_LABELS[recipe.difficulty]}</span>
-              <span>👤 {recipe.authorName}</span>
-              <span className={recipe.isPublic ? 'tag-public' : 'tag-private'}>
-                {recipe.isPublic ? 'publiczny' : 'prywatny'}
-              </span>
+                <p className="showcase-step-label">
+                    Krok {currentStep + 1} | {actionLabels[recipe.steps[currentStep].action]}
+                </p>
+
+                <p className="showcase-description">
+                    {recipe.steps[currentStep].description}
+                </p>
+
+                {(recipe.steps[currentStep].ingredient || recipe.steps[currentStep].action === 'składnikowy') && (
+                    <p className="showcase-ingredient">
+                        Składnik: {recipe.steps[currentStep].ingredient || '—'}
+                        {recipe.steps[currentStep].ingredientAmount ? ` ${parseFloat(recipe.steps[currentStep].ingredientAmount)}` : ''}
+                    </p>
+                )}
+
+                {recipe.steps[currentStep].action === 'akcyjny' && (
+                    <>
+                        <div className="showcase-meta">
+                            {recipe.steps[currentStep].temperature && (
+                                <span>🌡️ {recipe.steps[currentStep].temperature}°C</span>
+                            )}
+                            {recipe.steps[currentStep].speed !== '0' && (
+                                <span>⚡ Prędkość: {recipe.steps[currentStep].speed}</span>
+                            )}
+                        </div>
+
+                        {maxTime > 0 && (
+                            <p className="showcase-timer">{formatTime(timer)}</p>
+                        )}
+                    </>
+                )}
+
+                <div className="showcase-controls">
+                    <button
+                        className="showcase-ctrl-btn"
+                        onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
+                        disabled={currentStep === 0}
+                    >
+                        &#9664;
+                    </button>
+                    <button
+                        className="showcase-ctrl-btn showcase-ctrl-main"
+                        onClick={() => setIsRunning(s => !s)}
+                    >
+                        {isRunning ? '⏸' : '▶'}
+                    </button>
+                    <button
+                        className="showcase-ctrl-btn"
+                        onClick={() => setCurrentStep(s => Math.min(recipe.steps.length - 1, s + 1))}
+                        disabled={currentStep === recipe.steps.length - 1}
+                    >
+                        &#9654;
+                    </button>
+                </div>
+
+                <div className="showcase-step-dots">
+                    {recipe.steps.map((_, i) => (
+                        <span
+                            key={i}
+                            className={`showcase-dot${i === currentStep ? ' active' : ''}`}
+                        />
+                    ))}
+                </div>
             </div>
-            <div className="showcase-actions">
-              <a className="btn primary" href={recipeApi.exportUrl(recipe._id)} download>
-                ⬇ Eksportuj do DreamFoodX
-              </a>
-              {isOwner && (
-                <>
-                  <button className="btn ghost" onClick={() => navigate(`/edytuj-przepis/${recipe._id}`)}>
-                    Edytuj
-                  </button>
-                  <button className="btn danger" onClick={() => setConfirmDelete(true)}>
-                    Usuń
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </header>
-
-        {/* ---- Ingredients ---- */}
-        <section className="showcase-section">
-          <h2>Składniki</h2>
-          <ul className="showcase-ingredients">
-            {recipe.ingredients.map((ing, i) => (
-              <li key={i}>
-                <span>{ing.name}</span>
-                <span className="qty">
-                  {ing.quantity} {ing.unit}
-                </span>
-              </li>
-            ))}
-            {recipe.ingredients.length === 0 && <li className="muted">Brak składników</li>}
-          </ul>
-        </section>
-
-        {/* ---- Steps ---- */}
-        <section className="showcase-section">
-          <h2>Przygotowanie</h2>
-          <ol className="showcase-steps">
-            {recipe.steps.map((step, i) => {
-              const type = step.type ?? 'action'
-              return (
-                <li key={i} className={`showcase-step type-${type}`}>
-                  <div className="step-line">
-                    <span className="step-badge">{i + 1}</span>
-                    {type === 'ingredient' && (
-                      <>
-                        <span className="step-action">Dodaj składniki</span>
-                        <span className="step-text">
-                          {(step.items ?? [])
-                            .map((it) => `${it.name} ${it.quantity}${it.unit}`)
-                            .join(', ')}
-                        </span>
-                      </>
-                    )}
-                    {type === 'action' && (
-                      <span className="step-action">{ACTION_LABELS[step.action ?? 'mix']}</span>
-                    )}
-                    {type === 'description' && (
-                      <span className="step-text">{step.description}</span>
-                    )}
-                  </div>
-                  {type === 'action' && (
-                    <div className="step-params">
-                      <span>🌡️ {step.temperatureC ?? 0}°C</span>
-                      <span>🔪 {step.bladeSpeed ?? 0}</span>
-                      <span>⏱️ {secondsToMMSS(step.durationSeconds ?? 0)}</span>
-                    </div>
-                  )}
-                </li>
-              )
-            })}
-          </ol>
-        </section>
-      </article>
-
-      {confirmDelete && (
-        <div className="modal-overlay" onClick={() => !deleting && setConfirmDelete(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3 className="modal-title">Usunąć przepis „{recipe.name}”?</h3>
-            <p className="showcase-confirm-hint">Tej operacji nie można cofnąć.</p>
-            {delError && <p className="showcase-confirm-error">{delError}</p>}
-            <div className="modal-actions">
-              <button className="btn ghost" onClick={() => setConfirmDelete(false)} disabled={deleting}>
-                Anuluj
-              </button>
-              <button className="btn danger" onClick={handleDelete} disabled={deleting}>
-                {deleting ? 'Usuwanie…' : 'Tak, usuń'}
-              </button>
-            </div>
-          </div>
         </div>
-      )}
-    </>
-  )
+    )
 }

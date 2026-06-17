@@ -21,28 +21,6 @@
     align-items: center;
 }
 
-.navbar-user {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.user-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
-
-.user-name {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #333;
-}
-
 .tab-button {
     border-width: 1px;
     background: #FFFFFF;
@@ -55,9 +33,10 @@
 
 .tab-button, .tab-button-bold {
     color: #000000;
-    padding: 0.5vw 0.5vw;
+    padding: 0.5rem 0.75rem;
     border-radius: 1rem;
-    font-size: 1vw;
+    font-size: clamp(0.8rem, 0.9vw, 1.1rem);
+    white-space: nowrap;
 }
 
 .tab-button.active {
