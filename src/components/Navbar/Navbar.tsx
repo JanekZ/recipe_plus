@@ -25,6 +25,7 @@ export default function Navbar() {
         {tab('/', 'Przeglądaj')}
         {tab('/moje-przepisy', 'Moje Przepisy')}
         {tab('/moje-produkty', 'Moje Produkty')}
+        {tab('/asystent-ai', 'Asystent AI')}
         <button className="tab-button-bold" onClick={() => navigate('/nowy-przepis')}>
           + Nowy Przepis
         </button>

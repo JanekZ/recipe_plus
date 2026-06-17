@@ -6,6 +6,7 @@ import LoginPage from './components/Login/LoginPage.tsx'
 import AccountPage from './components/Account/AccountPage.tsx'
 import RecipeEditor from './components/RecipeEditor/RecipeEditor.tsx'
 import RecipeShowcase from './components/RecipeShowcase/RecipeShowcase.tsx'
+import ChatBot from './components/ChatBot/ChatBot.tsx'
 import './App.css'
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
       <Route path="/nowy-przepis" element={<RecipeEditor />} />
       <Route path="/edytuj-przepis/:id" element={<RecipeEditor />} />
       <Route path="/przepis/:id" element={<RecipeShowcase />} />
+      <Route path="/asystent-ai" element={<ChatBot />} />
     </Routes>
   )
 }
