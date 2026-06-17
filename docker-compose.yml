@@ -80,9 +80,8 @@ services:
     volumes:
       - ./ai-service:/app
     environment:
-      # klucze dla modeli
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PYTHONUNBUFFERED=1
     networks:
       - recipe-network
     restart: unless-stopped
