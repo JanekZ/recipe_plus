@@ -8,7 +8,7 @@ if (!process.env.JWT_SECRET) {
 }
 
 export interface TokenClaims {
-  sub: string // user id
+  sub: string
   email: string
   name: string
   lastName: string
