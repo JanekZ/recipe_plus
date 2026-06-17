@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext.tsx'
 import {
   ACTION_LABELS,
   DIFFICULTY_LABELS,
+  UNIT_LABELS,
   ApiError,
   recipeApi,
   type Recipe,
@@ -110,7 +111,7 @@ export default function RecipeShowcase() {
               <li key={i}>
                 <span>{ing.name}</span>
                 <span className="qty">
-                  {ing.quantity} {ing.unit}
+                  {ing.quantity} {UNIT_LABELS[ing.unit]}
                 </span>
               </li>
             ))}
@@ -133,7 +134,7 @@ export default function RecipeShowcase() {
                         <span className="step-action">Dodaj składniki</span>
                         <span className="step-text">
                           {(step.items ?? [])
-                            .map((it) => `${it.name} ${it.quantity}${it.unit}`)
+                            .map((it) => `${it.name} ${it.quantity} ${UNIT_LABELS[it.unit]}`)
                             .join(', ')}
                         </span>
                       </>

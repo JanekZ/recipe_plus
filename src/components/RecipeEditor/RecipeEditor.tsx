@@ -8,6 +8,7 @@ import {
   DIFFICULTY_LABELS,
   STEP_TYPE_LABELS,
   UNITS,
+  UNIT_LABELS,
   ApiError,
   productApi,
   recipeApi,
@@ -358,7 +359,7 @@ export default function RecipeEditor() {
             {ingredients.map((ing, i) => (
               <li key={i}>
                 <span>
-                  {ing.name || '—'} — {ing.quantity} {ing.unit}
+                  {ing.name || '—'} — {ing.quantity} {UNIT_LABELS[ing.unit]}
                   {ing.custom && <em className="custom-badge">własny</em>}
                 </span>
               </li>
@@ -557,7 +558,7 @@ function IngredientStepBody({
           <select value={it.unit ?? 'g'} onChange={(e) => setItem(i, { unit: e.target.value as Unit })}>
             {UNITS.map((u) => (
               <option key={u} value={u}>
-                {u}
+                {UNIT_LABELS[u]}
               </option>
             ))}
           </select>
