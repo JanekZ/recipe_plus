@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { RecipeSearchParams } from '../../api'
+import FilterPopup from '../FilterPopup/FilterPopup.tsx'
 import './SearchBar.css'
 
 interface SearchBarProps {
@@ -27,7 +28,7 @@ export default function SearchBar({ value, onChange, onSearch }: SearchBarProps)
               onChange={(e) => set({ q: e.target.value })}
               onKeyDown={(e) => e.key === 'Enter' && onSearch()}
             />
-            <button onClick={() => onChange({})} title="Wyczyść">
+            <button onClick={() => set({ q: '' })} title="Wyczyść">
               ✖️
             </button>
           </div>
@@ -38,30 +39,23 @@ export default function SearchBar({ value, onChange, onSearch }: SearchBarProps)
             Filtry
           </button>
         </div>
-
-        {showFilters && (
-          <div className="filters-panel">
-            <input
-              placeholder="Kategoria"
-              value={value.category ?? ''}
-              onChange={(e) => set({ category: e.target.value })}
-            />
-            <input
-              placeholder="Autor"
-              value={value.author ?? ''}
-              onChange={(e) => set({ author: e.target.value })}
-            />
-            <input
-              placeholder="Składnik"
-              value={value.ingredient ?? ''}
-              onChange={(e) => set({ ingredient: e.target.value })}
-            />
-            <button className="apply-button" onClick={onSearch}>
-              Zastosuj
-            </button>
-          </div>
-        )}
       </div>
+
+      {showFilters && (
+        <FilterPopup
+          category={value.category ?? ''}
+          author={value.author ?? ''}
+          skladniki={value.ingredient ?? ''}
+          onCategoryChange={(v) => set({ category: v })}
+          onAuthorChange={(v) => set({ author: v })}
+          onSkladnikiChange={(v) => set({ ingredient: v })}
+          onClear={() => set({ category: '', author: '', ingredient: '' })}
+          onClose={() => {
+            setShowFilters(false)
+            onSearch()
+          }}
+        />
+      )}
     </div>
   )
 }
