@@ -2,18 +2,11 @@ import { useNavigate } from 'react-router-dom'
 import type { Recipe } from '../../api'
 import './RecipeCard.css'
 
-const MAX_DESC_WORDS = 50
 const PLACEHOLDER = 'https://placehold.co/400x300/F17939/white?text=DreamFoodX'
 
 interface RecipeCardProps {
   recipe: Recipe
   showVisibility?: boolean
-}
-
-function truncateWords(text: string, maxWords: number) {
-  const words = text.split(' ')
-  if (words.length <= maxWords) return text
-  return words.slice(0, maxWords).join(' ') + '...'
 }
 
 export default function RecipeCard({ recipe, showVisibility = false }: RecipeCardProps) {
@@ -33,7 +26,7 @@ export default function RecipeCard({ recipe, showVisibility = false }: RecipeCar
           )}
         </div>
         <h3 className="recipe-name">{recipe.name}</h3>
-        <p className="recipe-description">{truncateWords(recipe.description, MAX_DESC_WORDS)}</p>
+        <p className="recipe-description">{recipe.description}</p>
         <div className="recipe-meta">
           <span className="meta-item">🕐 {minutes} min</span>
           <span className="meta-item">👥 {recipe.portions}</span>
