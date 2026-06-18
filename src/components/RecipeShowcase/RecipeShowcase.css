@@ -105,9 +105,20 @@
     border: none;
 }
 
+.btn.success {
+    background: #2e7d32;
+    color: #fff;
+    border: none;
+}
+
 .btn:disabled {
     opacity: 0.6;
     cursor: default;
+}
+
+/* keep the success state fully green even while disabled */
+.btn.success:disabled {
+    opacity: 1;
 }
 
 /* Delete confirmation modal */

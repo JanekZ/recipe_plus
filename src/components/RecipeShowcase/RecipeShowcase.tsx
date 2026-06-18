@@ -9,6 +9,7 @@ import {
   ApiError,
   recipeApi,
   type Recipe,
+  type RecipeInput,
 } from '../../api'
 import { secondsToMMSS } from '../../utils/time.ts'
 import './RecipeShowcase.css'
@@ -22,6 +23,9 @@ export default function RecipeShowcase() {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [delError, setDelError] = useState('')
+  const [copying, setCopying] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState('')
 
   useEffect(() => {
     if (!id) return
@@ -30,6 +34,32 @@ export default function RecipeShowcase() {
       .then(setRecipe)
       .catch(() => setError('Nie znaleziono przepisu lub jest prywatny'))
   }, [id])
+
+  const handleCopy = async () => {
+    if (!recipe) return
+    setCopying(true)
+    setCopyError('')
+    try {
+      const input: RecipeInput = {
+        name: recipe.name,
+        description: recipe.description,
+        category: recipe.category,
+        image: recipe.image,
+        difficulty: recipe.difficulty,
+        estimatedTimeSeconds: recipe.estimatedTimeSeconds,
+        portions: recipe.portions,
+        isPublic: false, // copies always land in the user's private recipes
+        ingredients: recipe.ingredients,
+        steps: recipe.steps,
+      }
+      await recipeApi.create(input)
+      setCopied(true)
+    } catch (err) {
+      setCopyError(err instanceof ApiError ? err.message : 'Nie udało się skopiować przepisu')
+    } finally {
+      setCopying(false)
+    }
+  }
 
   const handleDelete = async () => {
     if (!recipe) return
@@ -89,6 +119,19 @@ export default function RecipeShowcase() {
               <a className="btn primary" href={recipeApi.exportUrl(recipe._id)} download>
                 ⬇ Eksportuj do DreamFoodX
               </a>
+              {user && (
+                <button
+                  className={`btn ${copied ? 'success' : 'ghost'}`}
+                  onClick={handleCopy}
+                  disabled={copying || copied}
+                >
+                  {copying
+                    ? 'Kopiowanie…'
+                    : copied
+                      ? '✓ Skopiowano do „Moje Przepisy”'
+                      : '📋 Skopiuj przepis'}
+                </button>
+              )}
               {isOwner && (
                 <>
                   <button className="btn ghost" onClick={() => navigate(`/edytuj-przepis/${recipe._id}`)}>
@@ -100,6 +143,7 @@ export default function RecipeShowcase() {
                 </>
               )}
             </div>
+            {copyError && <p className="showcase-confirm-error">{copyError}</p>}
           </div>
         </header>
 
