@@ -20,12 +20,12 @@ function normalizeRecipeInput(body: any): { value?: any; error?: string } {
   for (const [i, s] of rawSteps.entries()) {
     const type = s?.type
     if (!STEP_TYPES.includes(type)) return { error: `step ${i + 1}: invalid or missing type` }
-    const order = i + 1 // array position is authoritative for ordering
+    const order = i + 1
 
     if (type === 'action') {
       if (!ACTIONS.includes(s.action)) return { error: `step ${i + 1}: invalid action` }
-      if (!Number.isInteger(s.temperatureC) || s.temperatureC < 0 || s.temperatureC > 160)
-        return { error: `step ${i + 1}: temperatureC must be an integer 0–160` }
+      if (!Number.isInteger(s.temperatureC) || s.temperatureC < 0 || s.temperatureC > 200)
+        return { error: `step ${i + 1}: temperatureC must be an integer 0–200` }
       if (!Number.isInteger(s.bladeSpeed) || s.bladeSpeed < 0 || s.bladeSpeed > 10)
         return { error: `step ${i + 1}: bladeSpeed must be an integer 0–10` }
       if (!Number.isInteger(s.durationSeconds) || s.durationSeconds < 1)
@@ -99,7 +99,7 @@ router.get('/', async (req, res: Response) => {
   const filter: any = { isPublic: true }
 
   if (typeof q === 'string' && q) filter.name = { $regex: q, $options: 'i' }
-  if (typeof category === 'string' && category) filter.category = category
+  if (typeof category === 'string' && category) filter.category = { $regex: category, $options: 'i' }
   if (typeof author === 'string' && author) filter.authorName = { $regex: author, $options: 'i' }
   if (typeof ingredient === 'string' && ingredient)
     filter['ingredients.name'] = { $regex: ingredient, $options: 'i' }
