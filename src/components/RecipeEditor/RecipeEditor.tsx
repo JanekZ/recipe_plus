@@ -274,7 +274,6 @@ export default function RecipeEditor() {
           </div>
         </div>
 
-        {error && <p className="editor-error">{error}</p>}
 
         {/* ---- Metadata ---- */}
         <section className="editor-card">
@@ -425,6 +424,20 @@ export default function RecipeEditor() {
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="modal-overlay" onClick={() => setError('')}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3 className="modal-title">Błąd</h3>
+            <p className="editor-error-text">{error}</p>
+            <div className="modal-actions">
+              <button className="btn primary" type="button" onClick={() => setError('')}>
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
@@ -611,13 +624,13 @@ function ActionStepBody({
           <input
             type="number"
             min={0}
-            max={160}
+            max={200}
             value={step.temperatureC ?? 0}
-            onChange={(e) => onChange({ temperatureC: clamp(Number(e.target.value), 0, 160) })}
+            onChange={(e) => onChange({ temperatureC: clamp(Number(e.target.value), 0, 200) })}
           />
         </label>
         <label className="field">
-          <span>🔪 Prędkość ostrzy (1–10)</span>
+          <span>🔪 Prędkość ostrzy (0–10)</span>
           <input
             type="number"
             min={0}
