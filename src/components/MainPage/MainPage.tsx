@@ -19,10 +19,10 @@ export default function MainPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Initial load of the public showcase.
   useEffect(() => {
-    runSearch({})
-  }, [runSearch])
+    const timer = setTimeout(() => runSearch(params), 300)
+    return () => clearTimeout(timer)
+  }, [params, runSearch])
 
   return (
     <>
