@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar.tsx";
 import { useAuth } from "../../context/AuthContext.tsx";
@@ -85,7 +85,7 @@ function toRecipeInput(recipe: GeneratedRecipe): RecipeInput {
                 type: "action",
                 order: order++,
                 action: toAction(s.action),
-                temperatureC: clampInt(s.temperatureC, 0, 160, 0),
+                temperatureC: clampInt(s.temperatureC, 0, 200, 0),
                 bladeSpeed: clampInt(s.bladeSpeed, 0, 10, 0),
                 durationSeconds: clampInt(s.durationSeconds, 1, 86400, 30),
             });
@@ -125,11 +125,11 @@ function toRecipeInput(recipe: GeneratedRecipe): RecipeInput {
         name: recipe.name,
         description: recipe.description,
         category: recipe.category || "Inne",
-        image: `https://placehold.co/400x300/F17939/white?text=${encodeURIComponent(recipe.name)}`,
+        image: "",
         difficulty: recipe.difficulty,
         estimatedTimeSeconds: clampInt(recipe.estimatedTimeSeconds, 0, 86400, 0),
         portions: clampInt(recipe.portions, 1, 999, 1),
-        isPublic: false, // always saved as a private recipe
+        isPublic: false,
         ingredients,
         steps,
     };
@@ -137,7 +137,12 @@ function toRecipeInput(recipe: GeneratedRecipe): RecipeInput {
 
 export default function ChatBot() {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
+
+    // Asystent AI is only available to logged-in users.
+    useEffect(() => {
+        if (!authLoading && !user) navigate("/login");
+    }, [authLoading, user, navigate]);
 
     const [messages, setMessages] = useState<Message[]>([
         {
