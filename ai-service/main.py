@@ -69,7 +69,7 @@ async def generate_recipe(req: ChatRequest):
         "- Pole \"difficulty\" MUSI być jedną z: easy, medium, hard.\n"
         "- Dla kroku typu \"action\" pole \"action\" MUSI być DOKŁADNIE jedną z (po angielsku): "
         "mix, cook, fry, chop, blend, knead, steam, weigh, warm, rest. Nie używaj innych słów (np. boil, bake, saute).\n"
-        "- W krokach \"action\": temperatureC to liczba całkowita 0-160, bladeSpeed to liczba całkowita 0-10, "
+        "- W krokach \"action\": temperatureC to liczba całkowita 0-200, bladeSpeed to liczba całkowita 0-10, "
         "durationSeconds to dodatnia liczba całkowita (w sekundach).\n"
         "- Krok typu \"ingredient\" musi mieć niepustą tablicę \"items\"; każdy element ma: "
         "\"name\" (tekst), \"quantity\" (liczba), \"unit\" (jedna z: g, kg, ml, l, tsp, tbsp, cup, pcs).\n"

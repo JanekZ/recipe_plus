@@ -63,7 +63,7 @@ export const DREAMFOODX_SCHEMA = {
           type: 'string',
           enum: ['mix', 'cook', 'fry', 'chop', 'blend', 'knead', 'steam', 'weigh', 'warm', 'rest'],
         },
-        temperatureC: { type: 'integer', minimum: 0, maximum: 160 },
+        temperatureC: { type: 'integer', minimum: 0, maximum: 200 },
         bladeSpeed: { type: 'integer', minimum: 0, maximum: 10 },
         durationSeconds: { type: 'integer', minimum: 1, maximum: 86400 },
       },

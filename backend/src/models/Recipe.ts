@@ -35,7 +35,7 @@ const StepSchema = new Schema(
 
     // action steps
     action: { type: String, enum: ACTIONS },
-    temperatureC: { type: Number, min: 0, max: 160 },
+    temperatureC: { type: Number, min: 0, max: 200 },
     bladeSpeed: { type: Number, min: 0, max: 10 },
     durationSeconds: { type: Number, min: 1, max: 86400 },
 
