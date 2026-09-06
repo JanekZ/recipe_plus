@@ -132,8 +132,11 @@ recipe_plus/
 │   ├── main.py               endpointy FastAPI i prompty
 │   └── requirements.txt
 │
-└── postgres/
-    └── init.sql              tabela users, indeksy, trigger updated_at
+├── postgres/
+│   └── init.sql              tabela users, indeksy, trigger updated_at
+│
+└── diagrams/
+    └── przeplywy-danych.png  diagram z sekcji Przepływy danych
 ```
 
 ---
