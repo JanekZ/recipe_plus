@@ -25,7 +25,6 @@ function readToken(req: Request): TokenClaims | null {
   }
 }
 
-/** Reject the request unless a valid bearer token is present. */
 export function requireAuth(req: AuthedRequest, res: Response, next: NextFunction) {
   const claims = readToken(req)
   if (!claims) return res.status(401).json({ error: 'Authentication required' })
@@ -33,7 +32,6 @@ export function requireAuth(req: AuthedRequest, res: Response, next: NextFunctio
   next()
 }
 
-/** Attach claims when present, but allow anonymous access (public browsing). */
 export function optionalAuth(req: AuthedRequest, _res: Response, next: NextFunction) {
   const claims = readToken(req)
   if (claims) req.user = claims

@@ -48,7 +48,6 @@ export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   hard: 'Trudny',
 }
 
-/** Polish display labels for units (stored values stay as the English enum). */
 export const UNIT_LABELS: Record<Unit, string> = {
   g: 'g',
   kg: 'kg',

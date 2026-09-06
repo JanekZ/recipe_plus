@@ -188,8 +188,6 @@ export function dreamFoodXToRecipeInput(payload: any) {
     }
   })
 
-  // Derive the ingredient list from ingredient steps (single source of truth),
-  // flattening every product across all ingredient steps.
   const ingredients = steps
     .filter((s: any) => s.type === 'ingredient')
     .flatMap((s: any) => s.items ?? [])
