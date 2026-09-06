@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import ActionIcon from '../ActionIcon/ActionIcon.tsx'
 import Navbar from '../Navbar/Navbar.tsx'
 import { useAuth } from '../../context/AuthContext.tsx'
 import {
@@ -594,6 +595,71 @@ function IngredientStepBody({
   )
 }
 
+function ActionSelect({
+  value,
+  onChange,
+}: {
+  value: ActionType
+  onChange: (action: ActionType) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onPointerDown = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false)
+    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open])
+
+  return (
+    <div className={`action-select${open ? ' open' : ''}`} ref={ref}>
+      <button
+        type="button"
+        className="action-select-trigger"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <ActionIcon action={value} />
+        <span className="action-select-value">{ACTION_LABELS[value]}</span>
+        <span className="action-select-caret" aria-hidden="true">
+          ▾
+        </span>
+      </button>
+      {open && (
+        <div className="action-select-list" role="listbox">
+          {ACTIONS.map((a) => (
+            <button
+              key={a}
+              type="button"
+              role="option"
+              aria-selected={a === value}
+              className={`action-select-option${a === value ? ' selected' : ''}`}
+              onClick={() => {
+                onChange(a)
+                setOpen(false)
+              }}
+            >
+              <ActionIcon action={a} />
+              <span>{ACTION_LABELS[a]}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function ActionStepBody({
   step,
   onChange,
@@ -604,19 +670,10 @@ function ActionStepBody({
   const { minutes, seconds } = splitSeconds(step.durationSeconds ?? 0)
   return (
     <>
-      <label className="field">
+      <div className="field">
         <span>Czynność</span>
-        <select
-          value={step.action ?? 'mix'}
-          onChange={(e) => onChange({ action: e.target.value as ActionType })}
-        >
-          {ACTIONS.map((a) => (
-            <option key={a} value={a}>
-              {ACTION_LABELS[a]}
-            </option>
-          ))}
-        </select>
-      </label>
+        <ActionSelect value={step.action ?? 'mix'} onChange={(action) => onChange({ action })} />
+      </div>
 
       <div className="appliance-params">
         <label className="field">
