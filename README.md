@@ -136,7 +136,10 @@ recipe_plus/
 │   └── init.sql              tabela users, indeksy, trigger updated_at
 │
 └── diagrams/
-    └── przeplywy-danych.png  diagram z sekcji Przepływy danych
+    ├── przeplywy-danych.png
+    ├── data-flow-diagram.png
+    ├── diagram-stanow-przepisu.png
+    └── diagram-stanow-sesji.png
 ```
 
 ---
