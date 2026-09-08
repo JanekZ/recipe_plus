@@ -208,14 +208,6 @@ function ActionRunner({
             <div className="cook-timer-fill" style={{ width: `${elapsed}%` }} />
           </div>
         </div>
-
-        <p className="cook-hint">
-          {running
-            ? `Odliczanie trwa${speed > 1 ? ` ${speed}× szybciej` : ''}, po jego zakończeniu przejdziemy dalej automatycznie.`
-            : started
-              ? 'Wstrzymano. Wznów, aby dokończyć krok.'
-              : 'Naciśnij „Start”, aby rozpocząć odliczanie tego kroku.'}
-        </p>
       </section>
 
       <footer className="cook-footer">
