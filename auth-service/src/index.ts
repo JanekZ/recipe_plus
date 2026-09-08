@@ -132,6 +132,44 @@ app.get('/auth/me', authenticate, async (req: Request, res: Response) => {
 })
 
 
+app.put('/auth/profile', authenticate, async (req: Request, res: Response) => {
+  const claims = (req as any).user
+  const { name, lastName, nickname } = req.body ?? {}
+
+  if (typeof name !== 'string' || !name.trim())
+    return res.status(400).json({ error: 'First name is required' })
+  if (typeof lastName !== 'string' || !lastName.trim())
+    return res.status(400).json({ error: 'Last name is required' })
+  if (typeof nickname !== 'string' || !nickname.trim())
+    return res.status(400).json({ error: 'Nickname is required' })
+
+  const trimmedNickname = nickname.trim()
+
+  try {
+    const nickTaken = await pool.query(
+      'SELECT 1 FROM users WHERE lower(nickname) = $1 AND id <> $2',
+      [trimmedNickname.toLowerCase(), claims.sub],
+    )
+    if (nickTaken.rowCount) return res.status(409).json({ error: 'Nickname already taken' })
+
+    const { rows } = await pool.query<UserRow>(
+      `UPDATE users SET name = $1, last_name = $2, nickname = $3
+       WHERE id = $4
+       RETURNING id, email, password_hash, name, last_name, nickname, created_at`,
+      [name.trim(), lastName.trim(), trimmedNickname, claims.sub],
+    )
+    const user = rows[0]
+    if (!user) return res.status(404).json({ error: 'User not found' })
+
+    // name and nickname travel inside the token, so the old one is now stale
+    return res.json({ token: signToken(claimsFor(user)), user: publicUser(user) })
+  } catch (err: any) {
+    if (err?.code === '23505') return res.status(409).json({ error: 'Nickname already taken' })
+    console.error('[auth] update profile failed', err)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 app.put('/auth/password', authenticate, async (req: Request, res: Response) => {
   const claims = (req as any).user
   const { currentPassword, newPassword } = req.body ?? {}
