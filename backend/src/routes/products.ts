@@ -1,30 +1,43 @@
 import { Router, type Response } from 'express'
+import { isValidObjectId } from 'mongoose'
 import { Product } from '../models/Product'
 import { requireAuth, optionalAuth, type AuthedRequest } from '../jwt'
+import { asyncRoute } from '../asyncRoute'
+import { contains, escapeRegex } from '../regex'
 
 const router = Router()
 
-router.get('/', optionalAuth, async (req: AuthedRequest, res: Response) => {
+async function nameTaken(name: string, ownerId: string, excludeId?: string): Promise<boolean> {
+  const escaped = escapeRegex(name)
+  const filter: any = {
+    name: { $regex: `^${escaped}$`, $options: 'i' },
+    $or: [{ scope: 'global' }, { scope: 'user', ownerId }],
+  }
+  if (excludeId) filter._id = { $ne: excludeId }
+  return !!(await Product.findOne(filter))
+}
+
+router.get('/', optionalAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const { category, q } = req.query
   const visibility: any[] = [{ scope: 'global' }]
   if (req.user) visibility.push({ scope: 'user', ownerId: req.user.sub })
 
   const filter: any = { $or: visibility }
   if (typeof category === 'string' && category) filter.category = category
-  if (typeof q === 'string' && q) filter.name = { $regex: q, $options: 'i' }
+  if (typeof q === 'string' && q) filter.name = contains(q)
 
   const products = await Product.find(filter).sort({ category: 1, name: 1 }).lean()
   res.json(products)
-})
+}))
 
-router.get('/categories', optionalAuth, async (req: AuthedRequest, res: Response) => {
+router.get('/categories', optionalAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const visibility: any[] = [{ scope: 'global' }]
   if (req.user) visibility.push({ scope: 'user', ownerId: req.user.sub })
   const categories = await Product.distinct('category', { $or: visibility })
   res.json(categories.sort())
-})
+}))
 
-router.post('/', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.post('/', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const { name, category } = req.body ?? {}
   if (typeof name !== 'string' || !name.trim())
     return res.status(400).json({ error: 'name is required' })
@@ -32,12 +45,8 @@ router.post('/', requireAuth, async (req: AuthedRequest, res: Response) => {
     return res.status(400).json({ error: 'category is required' })
 
   const trimmedName = name.trim()
-  const escaped = trimmedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const clash = await Product.findOne({
-    name: { $regex: `^${escaped}$`, $options: 'i' },
-    $or: [{ scope: 'global' }, { scope: 'user', ownerId: req.user!.sub }],
-  })
-  if (clash) return res.status(409).json({ error: 'A product with this name already exists' })
+  if (await nameTaken(trimmedName, req.user!.sub))
+    return res.status(409).json({ error: 'A product with this name already exists' })
 
   try {
     const product = await Product.create({
@@ -53,20 +62,51 @@ router.post('/', requireAuth, async (req: AuthedRequest, res: Response) => {
     console.error('[recipe] create product failed', err)
     res.status(500).json({ error: 'Internal server error' })
   }
-})
+}))
 
-router.delete('/mine', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.put('/:id', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
+  if (!isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Product not found' })
+
+  const { name, category } = req.body ?? {}
+  if (typeof name !== 'string' || !name.trim())
+    return res.status(400).json({ error: 'name is required' })
+  if (typeof category !== 'string' || !category.trim())
+    return res.status(400).json({ error: 'category is required' })
+
+  const product = await Product.findById(req.params.id)
+  if (!product) return res.status(404).json({ error: 'Product not found' })
+  if (product.scope !== 'user' || product.ownerId !== req.user!.sub)
+    return res.status(403).json({ error: 'You can only edit your own products' })
+
+  const trimmedName = name.trim()
+  if (await nameTaken(trimmedName, req.user!.sub, String(product._id)))
+    return res.status(409).json({ error: 'A product with this name already exists' })
+
+  product.set({ name: trimmedName, category: category.trim() })
+  try {
+    await product.save()
+    res.json(product)
+  } catch (err: any) {
+    if (err?.code === 11000)
+      return res.status(409).json({ error: 'A product with this name already exists' })
+    console.error('[recipe] update product failed', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}))
+
+router.delete('/mine', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const result = await Product.deleteMany({ scope: 'user', ownerId: req.user!.sub })
   res.json({ deleted: result.deletedCount ?? 0 })
-})
+}))
 
-router.delete('/:id', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.delete('/:id', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
+  if (!isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Product not found' })
   const product = await Product.findById(req.params.id)
   if (!product) return res.status(404).json({ error: 'Product not found' })
   if (product.scope !== 'user' || product.ownerId !== req.user!.sub)
     return res.status(403).json({ error: 'You can only delete your own products' })
   await product.deleteOne()
   res.status(204).end()
-})
+}))
 
 export default router

@@ -29,6 +29,12 @@ export const authApi = {
       body: { email, password },
     }),
   me: () => auth<{ user: User }>('/auth/me', { auth: true }),
+  updateProfile: (name: string, lastName: string, nickname: string) =>
+    auth<{ token: string; user: User }>('/auth/profile', {
+      method: 'PUT',
+      body: { name, lastName, nickname },
+      auth: true,
+    }),
   changePassword: (currentPassword: string, newPassword: string) =>
     auth<{ ok: true }>('/auth/password', {
       method: 'PUT',
@@ -67,6 +73,8 @@ export const productApi = {
   categories: () => recipes<string[]>('/products/categories', { auth: true }),
   create: (name: string, category: string) =>
     recipes<Product>('/products', { method: 'POST', body: { name, category }, auth: true }),
+  update: (id: string, name: string, category: string) =>
+    recipes<Product>(`/products/${id}`, { method: 'PUT', body: { name, category }, auth: true }),
   remove: (id: string) =>
     recipes<void>(`/products/${id}`, { method: 'DELETE', auth: true }),
   deleteMine: () =>

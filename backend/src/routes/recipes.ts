@@ -8,6 +8,8 @@ import {
   dreamFoodXToRecipeInput,
 } from '../dreamfoodx'
 import { generateDescription } from '../aiClient'
+import { asyncRoute } from '../asyncRoute'
+import { contains } from '../regex'
 
 const router = Router()
 
@@ -94,31 +96,31 @@ function normalizeRecipeInput(body: any): { value?: any; error?: string } {
   return { value }
 }
 
-router.get('/', async (req, res: Response) => {
+router.get('/', asyncRoute(async (req, res: Response) => {
   const { q, category, author, ingredient } = req.query
   const filter: any = { isPublic: true }
 
-  if (typeof q === 'string' && q) filter.name = { $regex: q, $options: 'i' }
-  if (typeof category === 'string' && category) filter.category = { $regex: category, $options: 'i' }
-  if (typeof author === 'string' && author) filter.authorName = { $regex: author, $options: 'i' }
+  if (typeof q === 'string' && q) filter.name = contains(q)
+  if (typeof category === 'string' && category) filter.category = contains(category)
+  if (typeof author === 'string' && author) filter.authorName = contains(author)
   if (typeof ingredient === 'string' && ingredient)
-    filter['ingredients.name'] = { $regex: ingredient, $options: 'i' }
+    filter['ingredients.name'] = contains(ingredient)
 
   const recipes = await Recipe.find(filter).sort({ createdAt: -1 }).limit(100).lean()
   res.json(recipes)
-})
+}))
 
-router.get('/mine', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.get('/mine', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const recipes = await Recipe.find({ authorId: req.user!.sub }).sort({ createdAt: -1 }).lean()
   res.json(recipes)
-})
+}))
 
-router.delete('/mine', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.delete('/mine', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const result = await Recipe.deleteMany({ authorId: req.user!.sub })
   res.json({ deleted: result.deletedCount ?? 0 })
-})
+}))
 
-router.post('/import', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.post('/import', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const { valid, errors } = validateDreamFoodX(req.body)
   if (!valid) return res.status(400).json({ error: 'Invalid DreamFoodX file', details: errors })
 
@@ -130,9 +132,9 @@ router.post('/import', requireAuth, async (req: AuthedRequest, res: Response) =>
     authorName: req.user!.nickname ?? req.user!.name,
   })
   res.status(201).json(recipe)
-})
+}))
 
-router.post('/ai/describe', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.post('/ai/describe', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const { ingredients, dishName, language } = req.body ?? {}
   if (!Array.isArray(ingredients) || ingredients.length === 0)
     return res.status(400).json({ error: 'ingredients (non-empty array) is required' })
@@ -147,18 +149,18 @@ router.post('/ai/describe', requireAuth, async (req: AuthedRequest, res: Respons
     console.error('[recipe] ai describe failed', err)
     res.status(502).json({ error: 'AI service unavailable' })
   }
-})
+}))
 
-router.get('/:id', optionalAuth, async (req: AuthedRequest, res: Response) => {
+router.get('/:id', optionalAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   if (!isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Recipe not found' })
   const recipe = await Recipe.findById(req.params.id).lean()
   if (!recipe) return res.status(404).json({ error: 'Recipe not found' })
   if (!recipe.isPublic && recipe.authorId !== req.user?.sub)
     return res.status(403).json({ error: 'This recipe is private' })
   res.json(recipe)
-})
+}))
 
-router.get('/:id/export', optionalAuth, async (req: AuthedRequest, res: Response) => {
+router.get('/:id/export', optionalAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   if (!isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Recipe not found' })
   const recipe = await Recipe.findById(req.params.id).lean()
   if (!recipe) return res.status(404).json({ error: 'Recipe not found' })
@@ -169,9 +171,9 @@ router.get('/:id/export', optionalAuth, async (req: AuthedRequest, res: Response
   const filename = `${recipe.name.replace(/[^a-z0-9]+/gi, '_').toLowerCase()}.dreamfoodx.json`
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
   res.json(envelope)
-})
+}))
 
-router.post('/', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.post('/', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const { value, error } = normalizeRecipeInput(req.body)
   if (error) return res.status(400).json({ error })
   const recipe = await Recipe.create({
@@ -180,9 +182,9 @@ router.post('/', requireAuth, async (req: AuthedRequest, res: Response) => {
     authorName: req.user!.nickname ?? req.user!.name,
   })
   res.status(201).json(recipe)
-})
+}))
 
-router.put('/:id', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.put('/:id', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   if (!isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Recipe not found' })
   const recipe = await Recipe.findById(req.params.id)
   if (!recipe) return res.status(404).json({ error: 'Recipe not found' })
@@ -195,9 +197,9 @@ router.put('/:id', requireAuth, async (req: AuthedRequest, res: Response) => {
   recipe.set(value)
   await recipe.save()
   res.json(recipe)
-})
+}))
 
-router.delete('/:id', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.delete('/:id', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   if (!isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Recipe not found' })
   const recipe = await Recipe.findById(req.params.id)
   if (!recipe) return res.status(404).json({ error: 'Recipe not found' })
@@ -205,6 +207,6 @@ router.delete('/:id', requireAuth, async (req: AuthedRequest, res: Response) => 
     return res.status(403).json({ error: 'You can only delete your own recipes' })
   await recipe.deleteOne()
   res.status(204).end()
-})
+}))
 
 export default router
