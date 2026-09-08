@@ -78,6 +78,9 @@
     margin: 0;
     line-height: 1.3;
     flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 0.25rem;
 }
 
 .recipe-meta {

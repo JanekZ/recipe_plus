@@ -1,59 +1,73 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Navbar from "../Navbar/Navbar.tsx"
-import SearchBar from "../SearchBar/SearchBar.tsx"
-import FoodGallery from "../FoodGallery/FoodGallery.tsx"
-import { recipes } from "../../data/recipes.ts"
+import Navbar from '../Navbar/Navbar.tsx'
+import FoodGallery from '../FoodGallery/FoodGallery.tsx'
+import { useAuth } from '../../context/AuthContext.tsx'
+import { recipeApi, type Recipe } from '../../api'
 import './MyRecipePage.css'
 
 type VisibilityFilter = 'all' | 'public' | 'private'
 
-export default function MyRecipePage(){
-    const navigate = useNavigate()
-    const [filter, setFilter] = useState<VisibilityFilter>('all')
+export default function MyRecipePage() {
+  const navigate = useNavigate()
+  const { user, loading: authLoading } = useAuth()
+  const [filter, setFilter] = useState<VisibilityFilter>('all')
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [loading, setLoading] = useState(true)
 
-    const publicCount = recipes.filter(r => r.isPublic).length
-    const privateCount = recipes.filter(r => !r.isPublic).length
+  useEffect(() => {
+    if (!authLoading && !user) navigate('/login')
+  }, [authLoading, user, navigate])
 
-    const showEmpty = (filter === 'public' && publicCount === 0) || (filter === 'private' && privateCount === 0)
-    const emptyMessage = filter === 'private'
-        ? 'Nie masz jeszcze żadnego prywatnego przepisu'
-        : 'Nie masz jeszcze żadnego publicznego przepisu'
+  useEffect(() => {
+    if (!user) return
+    setLoading(true)
+    recipeApi
+      .mine()
+      .then(setRecipes)
+      .catch(() => setRecipes([]))
+      .finally(() => setLoading(false))
+  }, [user])
 
-    return (
-        <>
-            <Navbar />
-            <div className="visibility-toggle">
-                <div className="toggle-group">
-                    <button
-                        className={`toggle-btn ${filter === 'all' ? 'active' : ''}`}
-                        onClick={() => setFilter('all')}
-                    >
-                        wszystkie
-                    </button>
-                    <button
-                        className={`toggle-btn ${filter === 'public' ? 'active' : ''}`}
-                        onClick={() => setFilter('public')}
-                    >
-                        publiczne ({publicCount})
-                    </button>
-                    <button
-                        className={`toggle-btn ${filter === 'private' ? 'active' : ''}`}
-                        onClick={() => setFilter('private')}
-                    >
-                        prywatne ({privateCount})
-                    </button>
-                </div>
-            </div>
-            <SearchBar />
-            {showEmpty ? (
-                <div className="empty-recipes">
-                    <p>{emptyMessage}</p>
-                    <button onClick={() => navigate('/nowy-przepis')}>Dodaj przepis</button>
-                </div>
-            ) : (
-                <FoodGallery filter={filter} showVisibility={filter === 'all'} hideSearchBar />
-            )}
-        </>
-    )
+  const publicCount = recipes.filter((r) => r.isPublic).length
+  const privateCount = recipes.filter((r) => !r.isPublic).length
+
+  const visible =
+    filter === 'all'
+      ? recipes
+      : recipes.filter((r) => (filter === 'public' ? r.isPublic : !r.isPublic))
+
+  return (
+    <>
+      <Navbar />
+      <div className="visibility-toggle">
+        <div className="toggle-group">
+          <button
+            className={`toggle-btn ${filter === 'all' ? 'active' : ''}`}
+            onClick={() => setFilter('all')}
+          >
+            wszystkie
+          </button>
+          <button
+            className={`toggle-btn ${filter === 'public' ? 'active' : ''}`}
+            onClick={() => setFilter('public')}
+          >
+            publiczne ({publicCount})
+          </button>
+          <button
+            className={`toggle-btn ${filter === 'private' ? 'active' : ''}`}
+            onClick={() => setFilter('private')}
+          >
+            prywatne ({privateCount})
+          </button>
+        </div>
+      </div>
+      <FoodGallery
+        recipes={visible}
+        loading={loading}
+        showVisibility={filter === 'all'}
+        emptyText="Nie masz jeszcze przepisów. Utwórz pierwszy!"
+      />
+    </>
+  )
 }

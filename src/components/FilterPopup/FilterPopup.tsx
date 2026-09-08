@@ -12,15 +12,15 @@ interface FilterPopupProps {
 }
 
 export default function FilterPopup({
-    onClose,
-    category,
-    author,
-    skladniki,
-    onCategoryChange,
-    onAuthorChange,
-    onSkladnikiChange,
-    onClear
-}: FilterPopupProps){
+                                        onClose,
+                                        category,
+                                        author,
+                                        skladniki,
+                                        onCategoryChange,
+                                        onAuthorChange,
+                                        onSkladnikiChange,
+                                        onClear
+                                    }: FilterPopupProps){
     return (
         <div className="filter-overlay" onClick={onClose}>
             <div className="filter-panel" onClick={e => e.stopPropagation()}>

@@ -1,0 +1,124 @@
+volumes:
+  postgres-data:
+  mongo-data:
+
+networks:
+  recipe-network:
+    driver: bridge
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '5173:5173'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3001
+      - VITE_AUTH_URL=http://localhost:3002
+      - VITE_AI_URL=http://localhost:8000
+    depends_on:
+      - backend
+      - auth-service
+    networks:
+      - recipe-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - PORT=3001
+      - MONGO_URL=mongodb://mongo:27017/recipe_ingredients
+      - JWT_SECRET=${JWT_SECRET}
+      - AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      mongo:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    networks:
+      - recipe-network
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    ports:
+      - '3002:3002'
+    volumes:
+      - ./auth-service:/app
+      - /app/node_modules
+    environment:
+      - PORT=3002
+      - POSTGRES_URL=postgresql://recipe_user:recipe_pass@postgres:5432/recipe_db
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=7d
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - recipe-network
+    restart: unless-stopped
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./ai-service:/app
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PYTHONUNBUFFERED=1
+    networks:
+      - recipe-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=recipe_user
+      - POSTGRES_PASSWORD=recipe_pass
+      - POSTGRES_DB=recipe_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U recipe_user -d recipe_db']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - recipe-network
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_DATABASE=recipe_ingredients
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - recipe-network
+    restart: unless-stopped

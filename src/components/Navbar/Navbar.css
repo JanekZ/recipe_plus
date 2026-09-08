@@ -6,19 +6,55 @@
 }
 .navbar {
     width: 100%;
-    height: 10%;
+    min-height: 4.5rem;
+    box-sizing: border-box;
+    padding: 0.5rem 1rem;
+    gap: 0.75rem;
     background-color: #F6F4F4;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.navbar-logo {
+    flex: none;
+    height: 3.5rem;
+    width: auto;
+    cursor: pointer;
 }
 
 .buttons {
-    width: 50%;
-    height: 100%;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    gap: 0.4rem;
 }
 
 .navbar, .buttons {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
+}
+
+.navbar-user {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
 }
 
 .tab-button {
@@ -33,9 +69,10 @@
 
 .tab-button, .tab-button-bold {
     color: #000000;
-    padding: 0.5rem 0.75rem;
+    box-sizing: border-box;
+    padding: 0.45rem 0.9rem;
     border-radius: 1rem;
-    font-size: clamp(0.8rem, 0.9vw, 1.1rem);
+    font-size: 0.9rem;
     white-space: nowrap;
 }
 
@@ -57,4 +94,30 @@
 
 .tab-button-bold:hover {
     color: #FFFFFF;
+}
+
+@media (max-width: 980px) {
+    .buttons {
+        order: 3;
+        flex-basis: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .navbar {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .navbar-logo {
+        height: 2.75rem;
+    }
+
+    .tab-button, .tab-button-bold {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .user-name {
+        display: none;
+    }
 }

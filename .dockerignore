@@ -1,0 +1,11 @@
+node_modules
+**/node_modules
+dist
+.git
+.env
+*.log
+npm-debug.log*
+.vscode
+.idea
+ai-service/__pycache__
+**/__pycache__
