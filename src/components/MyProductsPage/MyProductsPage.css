@@ -48,11 +48,11 @@
     align-items: center;
     gap: 0.4rem;
     background-color: #FFFFFF;
-    border: 1px solid #dddddd;
+    border: 1px solid #ddd;
     border-radius: 2rem;
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
-    color: #333333;
+    color: #333;
 }
 
 .product-chip.own {
@@ -89,7 +89,7 @@
     background: none;
     border: none;
     font-size: 0.75rem;
-    color: #999999;
+    color: #999;
     cursor: pointer;
     padding: 0;
     line-height: 1;
@@ -128,6 +128,13 @@
     margin: 0;
 }
 
+.modal-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: -0.5rem;
+}
+
 .modal-input {
     font-size: 1rem;
     padding: 0.6rem 0.8rem;
@@ -157,7 +164,7 @@
 
 .modal-btn.cancel {
     background-color: #F6F4F4;
-    color: #555555;
+    color: #555;
 }
 
 .modal-btn.confirm {

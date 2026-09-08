@@ -18,7 +18,7 @@
     border: none;
     border-radius: 0.4rem;
     background-color: transparent;
-    color: #555555;
+    color: #555;
     cursor: pointer;
     transition: background-color 0.15s, color 0.15s;
 }
@@ -26,4 +26,33 @@
 .toggle-btn.active {
     background-color: #F17939;
     color: #FFFFFF;
+}
+
+.empty-recipes {
+    margin: 2rem 10%;
+    padding: 3rem 2rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.empty-recipes p {
+    font-size: 1.1rem;
+    color: #555;
+    margin: 0 0 1.5rem 0;
+}
+
+.empty-recipes button {
+    padding: 0.6rem 1.5rem;
+    background-color: #F17939;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.empty-recipes button:hover {
+    background-color: #d95f1a;
 }
