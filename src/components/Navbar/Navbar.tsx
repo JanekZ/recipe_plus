@@ -20,7 +20,7 @@ export default function Navbar() {
 
   return (
     <div className="navbar">
-      <img src={logo} style={{ height: '95%', cursor: 'pointer' }} onClick={() => navigate('/')} />
+      <img className="navbar-logo" src={logo} alt="Recipe+" onClick={() => navigate('/')} />
       <div className="buttons">
         {tab('/', 'Przeglądaj')}
         {tab('/moje-przepisy', 'Moje Przepisy')}
