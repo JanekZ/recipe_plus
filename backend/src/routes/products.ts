@@ -2,11 +2,13 @@ import { Router, type Response } from 'express'
 import { isValidObjectId } from 'mongoose'
 import { Product } from '../models/Product'
 import { requireAuth, optionalAuth, type AuthedRequest } from '../jwt'
+import { asyncRoute } from '../asyncRoute'
+import { contains, escapeRegex } from '../regex'
 
 const router = Router()
 
 async function nameTaken(name: string, ownerId: string, excludeId?: string): Promise<boolean> {
-  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const escaped = escapeRegex(name)
   const filter: any = {
     name: { $regex: `^${escaped}$`, $options: 'i' },
     $or: [{ scope: 'global' }, { scope: 'user', ownerId }],
@@ -15,27 +17,27 @@ async function nameTaken(name: string, ownerId: string, excludeId?: string): Pro
   return !!(await Product.findOne(filter))
 }
 
-router.get('/', optionalAuth, async (req: AuthedRequest, res: Response) => {
+router.get('/', optionalAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const { category, q } = req.query
   const visibility: any[] = [{ scope: 'global' }]
   if (req.user) visibility.push({ scope: 'user', ownerId: req.user.sub })
 
   const filter: any = { $or: visibility }
   if (typeof category === 'string' && category) filter.category = category
-  if (typeof q === 'string' && q) filter.name = { $regex: q, $options: 'i' }
+  if (typeof q === 'string' && q) filter.name = contains(q)
 
   const products = await Product.find(filter).sort({ category: 1, name: 1 }).lean()
   res.json(products)
-})
+}))
 
-router.get('/categories', optionalAuth, async (req: AuthedRequest, res: Response) => {
+router.get('/categories', optionalAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const visibility: any[] = [{ scope: 'global' }]
   if (req.user) visibility.push({ scope: 'user', ownerId: req.user.sub })
   const categories = await Product.distinct('category', { $or: visibility })
   res.json(categories.sort())
-})
+}))
 
-router.post('/', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.post('/', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const { name, category } = req.body ?? {}
   if (typeof name !== 'string' || !name.trim())
     return res.status(400).json({ error: 'name is required' })
@@ -60,9 +62,9 @@ router.post('/', requireAuth, async (req: AuthedRequest, res: Response) => {
     console.error('[recipe] create product failed', err)
     res.status(500).json({ error: 'Internal server error' })
   }
-})
+}))
 
-router.put('/:id', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.put('/:id', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   if (!isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Product not found' })
 
   const { name, category } = req.body ?? {}
@@ -90,14 +92,14 @@ router.put('/:id', requireAuth, async (req: AuthedRequest, res: Response) => {
     console.error('[recipe] update product failed', err)
     res.status(500).json({ error: 'Internal server error' })
   }
-})
+}))
 
-router.delete('/mine', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.delete('/mine', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   const result = await Product.deleteMany({ scope: 'user', ownerId: req.user!.sub })
   res.json({ deleted: result.deletedCount ?? 0 })
-})
+}))
 
-router.delete('/:id', requireAuth, async (req: AuthedRequest, res: Response) => {
+router.delete('/:id', requireAuth, asyncRoute(async (req: AuthedRequest, res: Response) => {
   if (!isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Product not found' })
   const product = await Product.findById(req.params.id)
   if (!product) return res.status(404).json({ error: 'Product not found' })
@@ -105,6 +107,6 @@ router.delete('/:id', requireAuth, async (req: AuthedRequest, res: Response) => 
     return res.status(403).json({ error: 'You can only delete your own products' })
   await product.deleteOne()
   res.status(204).end()
-})
+}))
 
 export default router
