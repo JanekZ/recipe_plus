@@ -1,0 +1,339 @@
+/* Cooking mode ---------------------------------------------------------- */
+.cook-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    z-index: 200;
+}
+
+.cook-panel {
+    background: #fff;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 560px;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Header ---------------------------------------------------------------- */
+.cook-head {
+    flex: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1.1rem 1.3rem 0.8rem;
+}
+
+.cook-head-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.cook-eyebrow {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #F17939;
+}
+
+.cook-recipe-name {
+    margin: 0.15rem 0 0;
+    font-size: 1.15rem;
+    line-height: 1.3;
+}
+
+.cook-close {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #666;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.cook-close:hover {
+    border-color: #F17939;
+    color: #F17939;
+}
+
+/* Progress -------------------------------------------------------------- */
+.cook-progress {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0 1.3rem 1rem;
+}
+
+.cook-progress-bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #f0eceb;
+    overflow: hidden;
+}
+
+.cook-progress-fill {
+    height: 100%;
+    background: #F17939;
+    border-radius: 3px;
+    transition: width 0.25s ease;
+}
+
+.cook-progress-label {
+    flex: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #777;
+}
+
+/* Body ------------------------------------------------------------------ */
+.cook-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1.2rem 1.3rem 1.3rem;
+    border-top: 1px solid #f2f0ef;
+}
+
+/* Stała wysokość treści tylko tam, gdzie starcza miejsca - dzięki temu panel
+   nie skacze między krokami, a na niskim oknie i tak da się go przewinąć. */
+@media (min-height: 600px) {
+    .cook-body {
+        min-height: 190px;
+    }
+}
+
+.cook-step-title {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.cook-action-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: #F17939;
+}
+
+.cook-action-head .action-icon {
+    width: 28px;
+    height: 28px;
+}
+
+.cook-action-head .cook-step-title {
+    color: #000;
+}
+
+.cook-items {
+    list-style: none;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.cook-items li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 0.5rem;
+    background: #faf8f7;
+    font-size: 1rem;
+}
+
+.cook-qty {
+    font-weight: 700;
+    color: #F17939;
+    white-space: nowrap;
+}
+
+.cook-description {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.55;
+    color: #333;
+}
+
+.cook-params {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.7rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Countdown ------------------------------------------------------------- */
+.cook-timer {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.cook-timer-value {
+    display: block;
+    font-size: 2.9rem;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    color: #bbb;
+    transition: color 0.2s ease;
+}
+
+.cook-timer.running .cook-timer-value {
+    color: #F17939;
+}
+
+.cook-timer-bar {
+    height: 6px;
+    margin-top: 0.6rem;
+    border-radius: 3px;
+    background: #f0eceb;
+    overflow: hidden;
+}
+
+.cook-timer-fill {
+    height: 100%;
+    background: #F17939;
+    border-radius: 3px;
+    transition: width 0.2s linear;
+}
+
+.cook-hint {
+    margin: 0.8rem 0 0;
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+}
+
+/* Finished -------------------------------------------------------------- */
+.cook-done {
+    text-align: center;
+}
+
+.cook-done-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 0.7rem;
+    border-radius: 50%;
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.cook-done-hint {
+    margin: 0.5rem 0 0;
+    color: #777;
+}
+
+/* Footer ---------------------------------------------------------------- */
+.cook-footer {
+    flex: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 0.9rem 1.3rem 1.2rem;
+    border-top: 1px solid #f2f0ef;
+}
+
+.cook-speed {
+    flex: 1 1 140px;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.cook-speed input[type='range'] {
+    flex: 1;
+    min-width: 60px;
+    accent-color: #F17939;
+    cursor: pointer;
+}
+
+.cook-speed-value {
+    flex: none;
+    min-width: 2.4em;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #F17939;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.cook-footer-right {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.cook-btn {
+    border: none;
+    border-radius: 0.6rem;
+    padding: 0.65rem 1.3rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cook-btn.primary {
+    background: #F17939;
+    color: #fff;
+}
+
+.cook-btn.ghost {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    color: #000;
+}
+
+.cook-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+@media (max-width: 480px) {
+    .cook-timer-value {
+        font-size: 2.4rem;
+    }
+
+    .cook-btn {
+        padding: 0.6rem 0.85rem;
+        font-size: 0.9rem;
+    }
+
+    .cook-footer,
+    .cook-footer-right {
+        gap: 0.4rem;
+    }
+
+    .cook-speed {
+        flex-basis: 100%;
+        order: -1;
+    }
+
+    .cook-footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}

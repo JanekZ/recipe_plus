@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Navbar from '../Navbar/Navbar.tsx'
+import CookingMode from '../CookingMode/CookingMode.tsx'
 import { useAuth } from '../../context/AuthContext.tsx'
 import {
   ACTION_LABELS,
@@ -26,6 +27,7 @@ export default function RecipeShowcase() {
   const [copying, setCopying] = useState(false)
   const [copied, setCopied] = useState(false)
   const [copyError, setCopyError] = useState('')
+  const [cooking, setCooking] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -116,7 +118,17 @@ export default function RecipeShowcase() {
               </span>
             </div>
             <div className="showcase-actions">
-              <a className="btn primary" href={recipeApi.exportUrl(recipe._id)} download>
+              <button
+                className="btn primary"
+                onClick={() => setCooking(true)}
+                disabled={recipe.steps.length === 0}
+                title={
+                  recipe.steps.length === 0 ? 'Ten przepis nie ma jeszcze kroków' : undefined
+                }
+              >
+                ▶ Rozpocznij gotowanie
+              </button>
+              <a className="btn ghost" href={recipeApi.exportUrl(recipe._id)} download>
                 ⬇ Eksportuj do DreamFoodX
               </a>
               {user && (
@@ -203,6 +215,8 @@ export default function RecipeShowcase() {
           </ol>
         </section>
       </article>
+
+      {cooking && <CookingMode recipe={recipe} onClose={() => setCooking(false)} />}
 
       {confirmDelete && (
         <div className="modal-overlay" onClick={() => !deleting && setConfirmDelete(false)}>
