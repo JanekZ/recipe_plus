@@ -39,7 +39,7 @@ const StepSchema = new Schema(
     bladeSpeed: { type: Number, min: 0, max: 10 },
     durationSeconds: { type: Number, min: 1, max: 86400 },
 
-    // ingredient steps — one or more products added at this step
+    // ingredient steps - one or more products added at this step
     items: { type: [IngredientSchema], default: undefined },
 
     // description steps

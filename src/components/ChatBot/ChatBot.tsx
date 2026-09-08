@@ -256,7 +256,7 @@ export default function ChatBot() {
                                             className="save-recipe-btn saved"
                                             onClick={() => navigate(`/przepis/${msg.savedId}`)}
                                         >
-                                            ✓ Zapisano w „Moje Przepisy” — zobacz przepis
+                                            ✓ Zapisano w „Moje Przepisy”, zobacz przepis
                                         </button>
                                     ) : (
                                         <button

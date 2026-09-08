@@ -260,7 +260,7 @@ odpowiedzi, a wygenerowany przepis i tak przechodzi pełną walidację po stroni
 
 ## Zmienne środowiskowe
 
-Plik `.env` w katalogu głównym — czyta go Docker Compose:
+Plik `.env` w katalogu głównym - czyta go Docker Compose:
 
 | Zmienna | Opis |
 |---|---|
@@ -270,11 +270,11 @@ Plik `.env` w katalogu głównym — czyta go Docker Compose:
 Pozostałe wartości są zapisane wprost w `docker-compose.yml`, bo dotyczą wyłącznie
 środowiska deweloperskiego:
 
-- `POSTGRES_URL` — użytkownik `recipe_user`, hasło `recipe_pass`, baza `recipe_db`,
-- `MONGO_URL` — `mongodb://mongo:27017/recipe_ingredients`,
-- `JWT_EXPIRES_IN` — `7d`,
-- `AI_SERVICE_URL` — `http://ai-service:8000`,
-- `VITE_API_URL`, `VITE_AUTH_URL`, `VITE_AI_URL` — adresy usług dla przeglądarki.
+- `POSTGRES_URL` - użytkownik `recipe_user`, hasło `recipe_pass`, baza `recipe_db`,
+- `MONGO_URL` - `mongodb://mongo:27017/recipe_ingredients`,
+- `JWT_EXPIRES_IN` - `7d`,
+- `AI_SERVICE_URL` - `http://ai-service:8000`,
+- `VITE_API_URL`, `VITE_AUTH_URL`, `VITE_AI_URL` - adresy usług dla przeglądarki.
 
 ---
 

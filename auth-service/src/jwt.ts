@@ -4,7 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-insecure-secret-change-me'
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'
 
 if (!process.env.JWT_SECRET) {
-  console.warn('[auth] JWT_SECRET is not set — using an insecure dev default')
+  console.warn('[auth] JWT_SECRET is not set - using an insecure dev default')
 }
 
 export interface TokenClaims {

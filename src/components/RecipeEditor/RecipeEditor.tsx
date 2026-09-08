@@ -359,13 +359,13 @@ export default function RecipeEditor() {
             {ingredients.map((ing, i) => (
               <li key={i}>
                 <span>
-                  {ing.name || '—'} — {ing.quantity} {UNIT_LABELS[ing.unit]}
+                  {ing.name || '-'} - {ing.quantity} {UNIT_LABELS[ing.unit]}
                   {ing.custom && <em className="custom-badge">własny</em>}
                 </span>
               </li>
             ))}
             {ingredients.length === 0 && (
-              <li className="muted">Brak składników — dodaj krok składnikowy.</li>
+              <li className="muted">Brak składników, dodaj krok składnikowy.</li>
             )}
           </ul>
         </section>
