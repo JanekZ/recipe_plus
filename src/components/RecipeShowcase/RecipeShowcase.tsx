@@ -27,6 +27,8 @@ export default function RecipeShowcase() {
   const [copying, setCopying] = useState(false)
   const [copied, setCopied] = useState(false)
   const [copyError, setCopyError] = useState('')
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState('')
   const [cooking, setCooking] = useState(false)
 
   useEffect(() => {
@@ -60,6 +62,26 @@ export default function RecipeShowcase() {
       setCopyError(err instanceof ApiError ? err.message : 'Nie udało się skopiować przepisu')
     } finally {
       setCopying(false)
+    }
+  }
+
+  const handleExport = async () => {
+    if (!recipe) return
+    setExporting(true)
+    setExportError('')
+    try {
+      const envelope = await recipeApi.exportFile(recipe._id)
+      const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${recipe.name.replace(/[^a-z0-9]+/gi, '_').toLowerCase()}.dreamfoodx.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setExportError(err instanceof ApiError ? err.message : 'Nie udało się wyeksportować przepisu')
+    } finally {
+      setExporting(false)
     }
   }
 
@@ -128,9 +150,9 @@ export default function RecipeShowcase() {
               >
                 ▶ Rozpocznij gotowanie
               </button>
-              <a className="btn ghost" href={recipeApi.exportUrl(recipe._id)} download>
-                ⬇ Eksportuj do DreamFoodX
-              </a>
+              <button className="btn ghost" onClick={handleExport} disabled={exporting}>
+                {exporting ? 'Eksportowanie…' : '⬇ Eksportuj do DreamFoodX'}
+              </button>
               {user && (
                 <button
                   className={`btn ${copied ? 'success' : 'ghost'}`}
@@ -156,6 +178,7 @@ export default function RecipeShowcase() {
               )}
             </div>
             {copyError && <p className="showcase-confirm-error">{copyError}</p>}
+            {exportError && <p className="showcase-confirm-error">{exportError}</p>}
           </div>
         </header>
 

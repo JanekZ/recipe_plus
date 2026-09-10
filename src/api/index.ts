@@ -58,7 +58,7 @@ export const recipeApi = {
     recipes<void>(`/recipes/${id}`, { method: 'DELETE', auth: true }),
   importFile: (envelope: unknown) =>
     recipes<Recipe>('/recipes/import', { method: 'POST', body: envelope, auth: true }),
-  exportUrl: (id: string) => `${API_URL}/recipes/${id}/export`,
+  exportFile: (id: string) => recipes<unknown>(`/recipes/${id}/export`, { auth: true }),
   describe: (ingredients: string[], dishName?: string) =>
     recipes<{ description: string }>('/recipes/ai/describe', {
       method: 'POST',
